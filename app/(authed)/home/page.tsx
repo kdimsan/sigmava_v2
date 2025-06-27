@@ -1,0 +1,121 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Header from "@/components/Header/Header";
+import Calendar from "@/components/Calendar";
+import AppointmentList, { Appointment } from "@/components/AppointmentList";
+import StatsCard from "@/components/StatsCard";
+import {
+  approveAppointment,
+  cancelAppointment,
+  getAppointments,
+  rescheduleAppointment,
+} from "./actions/appointments";
+import ReassignModal from "@/components/ReassignModal";
+
+export default function Home() {
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [modalAppointment, setModalAppointment] = useState<Appointment | null>(
+    null
+  );
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+  const proximos = appointments.filter((a) => a.status === "scheduled");
+  const pendentes = appointments.filter((a) => a.status === "in_progress");
+  const cancelados = appointments.filter((a) => a.status === "cancelled");
+  const completados = appointments.filter((a) => a.status === "completed");
+
+  const fetchAppointments = async () => {
+    const data = await getAppointments();
+    setAppointments(data);
+  };
+
+  const handleReschedule = async (
+    appt: Appointment,
+    newDate: Date,
+    newTime: string
+  ) => {
+    await rescheduleAppointment(appt.id, newDate, newTime);
+    await fetchAppointments(); // <-- atualiza após reagendar
+    setModalAppointment(null);
+  };
+
+  const handleApprove = async (id: string) => {
+    await approveAppointment(id);
+    await fetchAppointments(); // atualiza após aprovação
+  };
+
+  const handleCancel = async (id: string) => {
+    console.log("Chamando cancelamento para:", id);
+    await cancelAppointment(id);
+    await fetchAppointments(); // atualiza após cancelamento
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  return (
+    <main className="max-w-11/12 mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <AppointmentList
+            title="Próximos"
+            appointments={proximos}
+            footerType="link"
+            onCancel={handleCancel}
+            onReschedule={(appt) => setModalAppointment(appt)}
+          />
+          <AppointmentList
+            title="Agendamentos"
+            appointments={pendentes}
+            footerType="link"
+            onApprove={handleApprove}
+            onCancel={handleCancel}
+            onReschedule={(appt) => setModalAppointment(appt)}
+          />
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-lg font-semibold text-blue-600 mb-4">Agenda</h2>
+            <Calendar
+              selectedDate={selectedDate}
+              onDateSelect={setSelectedDate}
+            />
+          </div>
+
+          <div>
+            <h2 className="text-xl flex gap-2">
+              <p className="text-blue-500 font-bold">Total</p>
+              <p className="text-gray-300 font-normal">VideoAtendimentos</p>
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              <StatsCard
+                title={completados.length}
+                subtitle="VideoAtendimentos"
+                value={270}
+                color="call"
+              />
+              <StatsCard
+                title={cancelados.length}
+                subtitle="VideoAtendimentos"
+                value={cancelados.length}
+                color="dismiss"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      {modalAppointment && (
+        <ReassignModal
+          isOpen={!!modalAppointment}
+          onClose={() => setModalAppointment(null)}
+          onConfirm={(date, time) =>
+            handleReschedule(modalAppointment, date, time)
+          }
+        />
+      )}
+    </main>
+  );
+}
