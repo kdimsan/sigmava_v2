@@ -1,91 +1,75 @@
-import AppointmentList from "@/components/AppointmentList";
+"use client";
+import AppointmentList, { Appointment } from "@/components/AppointmentList";
 import BackButton from "@/components/BackButton";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import {
+  approveAppointment,
+  cancelAppointment,
+  getAppointments,
+  rescheduleAppointment,
+} from "../actions/appointments";
+import ReassignModal from "@/components/ReassignModal";
 
-const proximosAtendimentos = [
-  {
-    id: "93172",
-    time: "14:15",
-    name: "Rogério Ribeiro",
-    subject: "Quebra de servidor e armazenamento",
-    status: "scheduled" as const,
-  },
-  {
-    id: "93171",
-    time: "14:30",
-    name: "Fátima Costa Martins",
-    subject: "Arrendamento",
-    status: "scheduled" as const,
-  },
-  {
-    id: "93170",
-    time: "14:45",
-    name: "Rogério Ribeiro",
-    subject: "Taxas Municipais",
-    status: "scheduled" as const,
-  },
-  {
-    id: "93169",
-    time: "16:15",
-    name: "Maria João Guilherme",
-    subject: "Pagamento de água",
-    status: "scheduled" as const,
-  },
-  {
-    id: "93175",
-    time: "16:45",
-    name: "Baneka Ribeiro",
-    subject: "Quebra de servidor e armazenamento",
-    status: "scheduled" as const,
-  },
-  {
-    id: "93174",
-    time: "16:15",
-    name: "Maria João Guilherme",
-    subject: "Pagamento de água",
-    status: "scheduled" as const,
-  },
-  {
-    id: "931766",
-    time: "16:45",
-    name: "Baneka Ribeiro",
-    subject: "Quebra de servidor e armazenamento",
-    status: "scheduled" as const,
-  },
-  {
-    id: "931722",
-    time: "16:15",
-    name: "Maria João Guilherme",
-    subject: "Pagamento de água",
-    status: "scheduled" as const,
-  },
-  {
-    id: "931732",
-    time: "16:45",
-    name: "Baneka Ribeiro",
-    subject: "Quebra de servidor e armazenamento",
-    status: "scheduled" as const,
-  },
-];
 export default function NextList() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [modalAppointment, setModalAppointment] = useState<Appointment | null>(
+    null
+  );
+
+  const fetchAppointments = async () => {
+    const data = await getAppointments("scheduled");
+    setAppointments(data);
+  };
+
+  const handleReschedule = async (
+    appt: Appointment,
+    newDate: Date,
+    newTime: string
+  ) => {
+    await rescheduleAppointment(appt.id, newDate, newTime);
+    await fetchAppointments();
+    setModalAppointment(null);
+  };
+
+  const handleApprove = async (id: string) => {
+    await approveAppointment(id);
+    await fetchAppointments();
+  };
+
+  const handleCancel = async (id: string) => {
+    await cancelAppointment(id);
+    await fetchAppointments();
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
   return (
     <main className="max-w-10/12 mx-auto h-svh flex-1">
-        <div className="flex gap-5">
-
-      <div className="mt-1.5">
-        <BackButton />
-      </div>
-      <div className="w-full">
-        {/*listagem */}
+      <div className="flex gap-5">
+        <div className="mt-1.5">
+          <BackButton />
+        </div>
+        <div className="w-full">
+          {/*listagem */}
 
           <AppointmentList
             title="Próximos"
-            appointments={proximosAtendimentos}
+            appointments={appointments}
             footerType="showMore"
           />
-
-      </div>
         </div>
+      </div>
+      {modalAppointment && (
+        <ReassignModal
+          isOpen={!!modalAppointment}
+          onClose={() => setModalAppointment(null)}
+          onConfirm={(date, time) =>
+            handleReschedule(modalAppointment, date, time)
+          }
+        />
+      )}
     </main>
   );
 }

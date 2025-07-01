@@ -36,19 +36,18 @@ export default function Home() {
     newTime: string
   ) => {
     await rescheduleAppointment(appt.id, newDate, newTime);
-    await fetchAppointments(); // <-- atualiza após reagendar
+    await fetchAppointments();
     setModalAppointment(null);
   };
 
   const handleApprove = async (id: string) => {
     await approveAppointment(id);
-    await fetchAppointments(); // atualiza após aprovação
+    await fetchAppointments(); 
   };
 
   const handleCancel = async (id: string) => {
-    console.log("Chamando cancelamento para:", id);
     await cancelAppointment(id);
-    await fetchAppointments(); // atualiza após cancelamento
+    await fetchAppointments(); 
   };
 
   useEffect(() => {

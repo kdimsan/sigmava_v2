@@ -3,13 +3,19 @@ import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 // exemplo de função no servidor
-export async function getAppointments() {
+export async function getAppointments(status?: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("video_services")
     .select("id, client_name, subject, datetime, video_service_state")
     .order("datetime", { ascending: true });
+
+  if (status && status !== "all") {
+    query = query.eq("video_service_state", status);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error("Erro ao buscar agendamentos:", error);
@@ -28,7 +34,8 @@ export async function getAppointments() {
     status: item.video_service_state as
       | "scheduled"
       | "in_progress"
-      | "cancelled",
+      | "cancelled"
+      | "completed",
   }));
 }
 

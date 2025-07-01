@@ -2,6 +2,7 @@
 
 import CallGreen from "@/assets/svgs/callGreen";
 import Dismiss from "@/assets/svgs/dismiss";
+import Link from "next/link";
 
 interface StatsCardProps {
   title: number;
@@ -51,11 +52,12 @@ export default function StatsCard({
             </div>
 
             {showViewAll && (
-              <button
+              <Link
+              href={color === "call" ? `/home/total_efetuados` : `/home/total_cancelados`}
                 className={`text-sm ${classes.text} hover:underline m-4 font-medium transition-all`}
               >
                 Ver todos ›
-              </button>
+              </Link>
             )}
           </div>
         </div>
