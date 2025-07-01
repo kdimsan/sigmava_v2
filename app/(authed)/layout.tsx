@@ -4,16 +4,8 @@ import Header from '@/components/Header/Header'
 import { createClient } from '@/utils/supabase/server'
 import { checkIfSuperUser, getUserProfile } from '@/lib/auth'
 import { getDepartments } from './home/actions/departments'
+import { getLogoUrlByLicense } from './actions/getLicenseLogo'
 
-interface User {
-  id: string
-  email: string
-  user_metadata?: {
-    is_superuser?: boolean
-    name?: string
-    role?: string
-  }
-}
 
 export default async function DashboardLayout({
   children,
@@ -38,9 +30,22 @@ export default async function DashboardLayout({
     avatar: data.user.user_metadata?.avatar_url
   }
 
+  let userData = {
+    name: headerUser.name,
+    role: headerUser.role,
+    avatar: headerUser.avatar,
+    logo: "",
+  };
+
+  if (userProfile?.role !== 'superuser') {
+    const logoUrl = await getLogoUrlByLicense(userProfile!.license_id);
+    userData.logo = logoUrl;
+  }
+
+
   return (
     <div className="min-h-screen bg-gray-50 p-2">
-      <Header user={headerUser} departments={departments} />
+      <Header user={userData} departments={departments} />
       
       <main className="flex-1">
         {children}

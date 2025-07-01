@@ -9,7 +9,7 @@ interface CalendarProps {
 }
 
 export default function Calendar({ selectedDate, onDateSelect }: CalendarProps) {
-  const [currentDate, setCurrentDate] = useState(new Date(2020, 1)) // Fevereiro 2020
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 5)) // Fevereiro 2020
   
   const monthNames = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',

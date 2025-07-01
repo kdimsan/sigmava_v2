@@ -25,8 +25,9 @@ interface HeaderProps {
     name: string;
     role: string;
     avatar?: string;
+    logo: string;
   };
-  departments: DepartmentProps[]
+  departments: DepartmentProps[];
 }
 
 export default function Header({ user, departments }: HeaderProps) {
@@ -39,7 +40,7 @@ export default function Header({ user, departments }: HeaderProps) {
     {
       icon: UserAdd,
       label: "UTILIZADORES",
-      content: <CreateUserForm departments={departments} />
+      content: <CreateUserForm departments={departments} />,
     },
     {
       icon: UsersAdd,
@@ -100,14 +101,22 @@ export default function Header({ user, departments }: HeaderProps) {
             onClick={() => router.push("/dashboard")}
             className="flex items-center space-x-3 hover:bg-gray-50 p-2 rounded-lg transition-colors"
           >
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-white" />
+            <div className="w-20 h-12 rounded-lg flex items-center justify-center">
+              <img
+                className="w-20"
+                src={
+                  user.logo ||
+                  "https://sigmava.pt/licenses_images/logo_sigmaVA_tipografia.svg"
+                }
+                alt="logo da licença"
+              />
             </div>
+            {/* NOME, ver com Jose se ele quer ;)
             <div>
               <div className="text-sm font-medium text-gray-900">Câmara</div>
               <div className="text-sm font-medium text-gray-900">Municipal</div>
               <div className="text-xs text-blue-600">V.A de Fafe</div>
-            </div>
+            </div> */}
           </button>
           <div className="w-[1px] h-[70px] bg-gray-300"></div>
 

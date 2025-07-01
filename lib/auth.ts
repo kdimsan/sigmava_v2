@@ -8,6 +8,7 @@ export interface UserProfile {
  role: "superuser" | "admin" | "user"
   created_at: string
   updated_at: string
+  license_id: number
 }
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
