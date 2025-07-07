@@ -1,5 +1,5 @@
 import React from "react";
-import { getDepartments } from "@/app/(authed)/admin/actions/departments";
+import { getDepartments } from "@/app/(authed)/admin/dashboard/actions/departments";
 import ScheduleCallPage from "@/components/ScheduleCallPage";
 
 export default async function ScheduleCall() {

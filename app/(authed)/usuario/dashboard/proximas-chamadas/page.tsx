@@ -1,4 +1,4 @@
-import { getAppointments } from "@/app/(authed)/admin/actions/appointments";
+import { getAppointments } from "@/app/(authed)/admin/dashboard/actions/appointments";
 import NextCallsPage from "@/components/NextCallsPage";
 import PageHeader from "@/components/ui/PageHeader";
 import React from "react";

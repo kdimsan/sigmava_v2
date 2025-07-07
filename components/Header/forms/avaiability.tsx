@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import Input from "@/components/Form/input";
-import { createAvaiability } from "@/app/(authed)/admin/actions/avaiabilities";
+import { createAvaiability } from "@/app/(authed)/admin/dashboard/actions/avaiabilities";
 
 const availabilityOptions = ["10min", "15min", "30min", "45min", "60min"];
 

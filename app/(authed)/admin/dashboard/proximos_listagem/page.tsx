@@ -7,7 +7,7 @@ import {
   cancelAppointment,
   getAppointments,
   rescheduleAppointment,
-} from "../actions/appointments";
+} from "../dashboard/actions/appointments";
 import ReassignModal from "@/components/ReassignModal";
 
 export default function NextList() {
