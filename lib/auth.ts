@@ -5,6 +5,7 @@ export interface UserProfile {
   user_id: string;
   email: string;
   full_name?: string;
+  name?: string;
   role: "superuser" | "admin" | "user";
   created_at: string;
   updated_at: string;
@@ -16,10 +17,46 @@ export async function getUserProfile(
 ): Promise<UserProfile | null> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
+  // Buscar no profiles
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", userId)
+    .single();
+
+  if (profile) {
+    // Achou perfil, retorna
+    return profile;
+  }
+
+
+  // Se não achou perfil, busca na clients (id)
+  const { data: client, error: clientError } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (client) {
+    return client;
+  }
+
+  if (clientError && clientError.code !== "PGRST116") {
+    console.error("Erro ao buscar cliente:", clientError);
+  }
+
+  return null;
+}
+
+export async function getClientProfile(
+  email: string
+): Promise<UserProfile | null> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("email", email)
     .single();
 
   if (error) {

@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import Input from "@/components/Form/input";
 import Select from "@/components/Form/select";
-import { createUsers } from "@/app/(authed)/home/actions/users";
+import { createUsers } from "@/app/(authed)/admin/actions/users";
 
 interface Department {
   id: number;

@@ -30,12 +30,10 @@ export async function createDepartment(formData: FormData) {
   const departmentName = formData.get("department_name") as string;
 
   // 4. Inserir o novo departamento com license_id
-  const { error: insertError } = await supabase
-    .from("departments")
-    .insert({
-      name: departmentName,
-      license_id: profile.license_id,
-    });
+  const { error: insertError } = await supabase.from("departments").insert({
+    name: departmentName,
+    license_id: profile.license_id,
+  });
 
   if (insertError) {
     console.error("Erro ao criar departamento:", insertError);
@@ -45,12 +43,25 @@ export async function createDepartment(formData: FormData) {
   console.log("Departamento criado com sucesso!");
 }
 
-export async function getDepartments() {
+export async function getDepartments(id?: number) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("departments")
-    .select("id, name");
+  if (id) {
+    const { data, error } = await supabase
+      .from("departments")
+      .select("id, name")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Erro ao buscar departamentos:", error);
+      return [];
+    }
+
+    return data ? [data] : [];
+  }
+
+  const { data, error } = await supabase.from("departments").select("id, name");
 
   if (error) {
     console.error("Erro ao buscar departamentos:", error);

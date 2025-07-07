@@ -1,6 +1,6 @@
 "use client";
 
-import { createLicense } from "@/app/(authed)/(super-user)/dashboard/actions/licenses";
+import { createLicense } from "@/app/(authed)/superuser/dashboard/actions/licenses";
 import { Key, Users } from "lucide-react";
 import React, { useState } from "react";
 

@@ -23,7 +23,7 @@ interface DepartmentProps {
 interface HeaderProps {
   user: {
     name: string;
-    role: string;
+    role?: string;
     avatar?: string;
     logo: string;
   };
@@ -63,7 +63,7 @@ export default function Header({ user, departments }: HeaderProps) {
       onClick: () => setActiveForm("profile"),
     },
   ];
-  console.log(user);
+  console.log("header user",user);
 
   if (user.role === "superuser") {
     return (
@@ -180,6 +180,7 @@ export default function Header({ user, departments }: HeaderProps) {
                 }
               >
                 {item.content}
+                
               </PopoverItem>
             );
           })}

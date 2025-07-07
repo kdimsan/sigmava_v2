@@ -1,31 +1,51 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { getDepartments } from "./departments";
 
-// exemplo de função no servidor
 export async function getAppointments(status?: string) {
   const supabase = await createClient();
 
   let query = supabase
     .from("video_services")
-    .select("id, client_name, subject, datetime, video_service_state")
+    .select("id, client_name, subject, datetime, video_service_state, department_id, message")
     .order("datetime", { ascending: true });
 
-  if (status && status !== "all") {
-    query = query.eq("video_service_state", status);
-  }
+    
+    if (status && status !== "all") {
+      query = query.eq("video_service_state", status);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error("Erro ao buscar agendamentos:", error);
+      return [];
+    }
+    const departmentIds = Array.from(new Set(data.map((item) => item.department_id)));
 
-  const { data, error } = await query;
+  // 2️⃣ Buscando todos os departamentos de uma vez
+  const { data: departments, error: deptError } = await supabase
+    .from("departments")
+    .select("id, name")
+    .in("id", departmentIds);
 
-  if (error) {
-    console.error("Erro ao buscar agendamentos:", error);
+  if (deptError || !departments) {
+    console.error("Erro ao buscar departamentos:", deptError);
     return [];
   }
 
+  // 3️⃣ Criando um Map para acesso rápido ao nome do departamento
+  const departmentMap = new Map(
+    departments.map((dept) => [dept.id, dept.name])
+  );
+    
   return data.map((item) => ({
     id: item.id.toString(),
     name: item.client_name,
     subject: item.subject,
+    department: departmentMap.get(item.department_id),
+    message: item.message,
     time: new Date(item.datetime).toLocaleTimeString("pt-PT", {
       hour: "2-digit",
       minute: "2-digit",
@@ -49,14 +69,13 @@ export async function approveAppointment(id: string) {
 
 export async function cancelAppointment(id: string) {
   const supabase = await createClient();
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("video_services")
     .update({ video_service_state: "cancelled" })
     .eq("id", id);
 
-    console.log("datra", data);
-    console.log("error", error);
-    
+  console.log("datra", data);
+  console.log("error", error);
 }
 
 export async function rescheduleAppointment(

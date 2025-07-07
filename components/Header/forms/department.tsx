@@ -1,4 +1,4 @@
-import { createDepartment } from "@/app/(authed)/home/actions/departments";
+import { createDepartment } from "@/app/(authed)/admin/actions/departments";
 import Input from "@/components/Form/input";
 import React from "react";
 

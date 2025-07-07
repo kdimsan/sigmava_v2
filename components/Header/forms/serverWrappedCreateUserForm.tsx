@@ -1,6 +1,6 @@
 "use server"
 // components/Form/ServerWrappedCreateUserForm.tsx
-import { getDepartments } from "@/app/(authed)/home/actions/departments";
+import { getDepartments } from "@/app/(authed)/admin/actions/departments";
 import CreateUserForm from "./createUserForm";
 
 export default async function ServerWrappedCreateUserForm() {

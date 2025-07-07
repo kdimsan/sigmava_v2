@@ -7,7 +7,6 @@ import { createClient } from "@/utils/supabase/server";
 export async function createUsers(formData: FormData) {
   const supabase = await createClient();
 
-  // 1. Buscar usuário atual (para pegar o license_id dele via profile)
   const { data: authUser, error: authError } = await supabase.auth.getUser();
   if (authError || !authUser?.user) {
     console.error("Usuário não autenticado.");
@@ -16,7 +15,6 @@ export async function createUsers(formData: FormData) {
 
   const currentUserId = authUser.user.id;
 
-  // 2. Buscar license_id do usuário logado
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("license_id")
@@ -36,11 +34,10 @@ export async function createUsers(formData: FormData) {
 
   const email = `${name.toLowerCase().replace(/\s+/g, "")}@sigmava.pt`;
 
-  // 4. Criar usuário no Auth com Supabase Admin para evitar login automático
   const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
     email,
     password,
-    email_confirm: true, // 👈 e-mail confirmado
+    email_confirm: true, 
   });
 
   if (createError || !newUser?.user) {

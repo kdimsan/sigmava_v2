@@ -13,7 +13,7 @@ export async function createLicense(formData: FormData) {
     postal_code: formData.get("zip"),
     contributing_number: formData.get("contributing_number"),
     abey: formData.get("abey"),
-    license_key: "LIC-MC7QR09F-5OOSXMS",
+    license_key: "LIC-MC7QR09F-5OOSXMSS",
     available_users: formData.get("available_users"),
     disabled: false,
     created_at: new Date(),
