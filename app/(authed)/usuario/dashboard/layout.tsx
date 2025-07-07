@@ -3,7 +3,7 @@ import Header from "@/components/Header/Header";
 import { createClient } from "@/utils/supabase/server";
 import { getClientProfile } from "@/lib/auth";
 
-import { getDepartments } from "../../admin/actions/departments";
+import { getDepartments } from "../../admin/dashboard/actions/departments";
 import { getLogoUrlByLicense } from "../../actions/getLicenseLogo";
 import MobileHeader from "@/components/MobileHeader";
 

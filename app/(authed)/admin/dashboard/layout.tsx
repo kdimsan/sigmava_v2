@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import Header from '@/components/Header/Header'
 import { createClient } from '@/utils/supabase/server'
 import { checkIfSuperUser, getUserProfile } from '@/lib/auth'
-import { getDepartments } from '../../admin/dashboard/actions/departments'
+import { getDepartments } from './actions/departments'
 import { getLogoUrlByLicense } from '../../actions/getLicenseLogo'
 
 
