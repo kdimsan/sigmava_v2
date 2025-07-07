@@ -6,6 +6,7 @@ import { getClientProfile } from "@/lib/auth";
 import { getDepartments } from "../../admin/dashboard/actions/departments";
 import { getLogoUrlByLicense } from "../../actions/getLicenseLogo";
 import MobileHeader from "@/components/MobileHeader";
+import { Toaster } from "react-hot-toast";
 
 export default async function UserLayout({
   children,
@@ -43,7 +44,7 @@ export default async function UserLayout({
       <div className="hidden md:block">
         <Header user={userData} departments={departments} />
       </div>
-
+      <Toaster position="top-center" />
       <main className="flex-1">{children}</main>
 
       <div className="block md:hidden">

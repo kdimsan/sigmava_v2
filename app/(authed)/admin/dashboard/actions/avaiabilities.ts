@@ -1,6 +1,7 @@
 // app/(authed)/home/actions/availability.ts
 "use server";
 
+import { AvailabilitySlot } from "@/components/ScheduleCallPage";
 import { createClient } from "@/utils/supabase/server";
 
 export async function createAvaiability(formData: FormData) {
@@ -72,4 +73,22 @@ for (const [key, value] of formData.entries()) {
     } else {
       console.log("Disponibilidade salva com sucesso!");
     }
+}
+
+export async function getAvaiability() {
+  const supabase = await createClient();
+
+  const { data: slots, error: slotsError } = await supabase
+    .from("slots")
+    .select("*")
+    .order("date", { ascending: true })
+    .order("start_time", { ascending: true });
+
+  if (slotsError) {
+    console.error("Erro ao buscar slots:", slotsError);
+    return [];
+  }
+  console.log("SLOTS", slots);
+  
+  return slots;
 }
