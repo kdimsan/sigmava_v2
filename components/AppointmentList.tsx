@@ -15,7 +15,6 @@ export interface Appointment {
   name: string;
   subject: string;
   status: "scheduled" | "in_progress" | "cancelled" | "pending" | "completed";
-
 }
 
 interface AppointmentListProps {
@@ -25,6 +24,7 @@ interface AppointmentListProps {
   onApprove?: (id: string) => void;
   onReschedule?: (appointment: Appointment) => void;
   onCancel?: (id: string) => void;
+  onComplete?: (id: string) => void;
 }
 
 export default function AppointmentList({
@@ -34,33 +34,8 @@ export default function AppointmentList({
   onApprove,
   onCancel,
   onReschedule,
+  onComplete,
 }: AppointmentListProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "scheduled":
-        return "bg-green-400 hover:bg-green-500";
-      case "in-progress":
-        return "bg-gray-400";
-      case "cancelled":
-        return "bg-red-500";
-      default:
-        return "bg-gray-400";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "scheduled":
-        return <CallGreen className="m-2" />;
-      case "in-progress":
-        return <Calendar className="hover:bg-red-400" />;
-      case "cancelled":
-        return <Dismiss />;
-      default:
-        return <Phone className="w-4 h-4 text-white" />;
-    }
-  };
-
   return (
     <div className="rounded-lg">
       <div className="flex gap-1 items-center my-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
@@ -83,75 +58,104 @@ export default function AppointmentList({
             </tr>
           </thead>
           <tbody className="space-y-2">
-            {appointments.map((appointment, index) => (
-              <tr
-                key={appointment.id}
-                className="border-b border-gray-50 last:border-b-0"
-              >
-                <td className="p-3">
-                  <div className="flex items-center space-x-2">
-                    <Search className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {appointment.id}
-                    </span>
-                  </div>
-                </td>
-                <td className="py-3">
-                  <span className="text-sm text-gray-900">
-                    {new Date(appointment.date).toLocaleDateString("pt-PT", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}
-                  </span>
-                </td>
-
-                <td className="py-3">
-                  <span className="text-sm text-gray-900">
-                    {appointment.time}
-                  </span>
-                </td>
-                <td className="py-3">
-                  <span className="text-sm text-gray-900">
-                    {appointment.name}
-                  </span>
-                </td>
-                <td className="py-3">
-                  <span className="text-sm text-gray-600">
-                    {appointment.subject}
-                  </span>
-                </td>
-                <td className="py-3">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => onApprove?.(appointment.id)}
-
-                      className="w-9 h-9 bg-green-400 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors"
-                      title="Aprovar"
-                    >
-                      {appointment.status === "in_progress" ? <Check /> : <CallGreen />}
-                    </button>
-
-                    <button
-                      onClick={() => onReschedule?.(appointment)}
-                      className="w-9 h-9 bg-gray-400 hover:bg-gray-500 rounded-full flex items-center justify-center transition-colors"
-                      title="Reagendar"
-                    >
-                      <Calendar />
-                    </button>
-
-                    <button
-                      onClick={() => onCancel?.(appointment.id)}
-
-                      className="w-9 h-9 bg-red-500 rounded-full flex items-center justify-center"
-                      title="Cancelar"
-                    >
-                      <X className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
+            {appointments.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="p-6 text-center text-gray-500 text-sm"
+                >
+                  Nenhum agendamento encontrado.
                 </td>
               </tr>
-            ))}
+            ) : (
+              appointments.map((appointment, index) => (
+                <tr
+                  key={appointment.id}
+                  className="border-b border-gray-50 last:border-b-0"
+                >
+                  <td className="p-3">
+                    <div className="flex items-center space-x-2">
+                      <Search className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-medium text-gray-900">
+                        {appointment.id}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-3">
+                    <span className="text-sm text-gray-900">
+                      {new Date(appointment.date).toLocaleDateString("pt-PT", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </td>
+
+                  <td className="py-3">
+                    <span className="text-sm text-gray-900">
+                      {appointment.time}
+                    </span>
+                  </td>
+                  <td className="py-3">
+                    <span className="text-sm text-gray-900">
+                      {appointment.name}
+                    </span>
+                  </td>
+                  <td className="py-3">
+                    <span className="text-sm text-gray-600">
+                      {appointment.subject}
+                    </span>
+                  </td>
+                  <td className="py-3">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={
+                          appointment.status === "in_progress"
+                            ? () => onApprove?.(appointment.id)
+                            : () => onComplete?.(appointment.id)
+                        }
+                        className={`w-9 h-9 bg-green-400 rounded-full flex items-center justify-center transition-colors ${
+                          !onApprove || !onComplete
+                            ? "hover:bg-gray-300 !hover:cursor-not-allowed transition-colors"
+                            : "hover:bg-green-500"
+                        }`}
+                        title="Aprovar"
+                      >
+                        {appointment.status === "in_progress" ? (
+                          <Check />
+                        ) : (
+                          <CallGreen />
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => onReschedule?.(appointment)}
+                        className={`w-9 h-9 bg-gray-400 rounded-full flex items-center justify-center transition-colors ${
+                          !onReschedule
+                            ? "hover:bg-gray-300 !!hover:cursor-not-allowed transition-colors"
+                            : "hover:bg-gray-500"
+                        }`}
+                        title="Reagendar"
+                      >
+                        <Calendar />
+                      </button>
+
+                      <button
+                        onClick={() => onCancel?.(appointment.id)}
+                        className={`w-9 h-9 bg-red-500 rounded-full flex items-center justify-center ${
+                          !onCancel
+                            ? "hover:bg-gray-300 !hover:cursor-not-allowed transition-colors"
+                            : ""
+                        }`}
+                        title="Cancelar"
+                      >
+                        <X className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 
@@ -160,8 +164,8 @@ export default function AppointmentList({
             <Link
               href={
                 title === "Próximos"
-                  ? "/home/proximos_listagem"
-                  : "/home/chamados_pendentes"
+                  ? "/admin/dashboard/proximos_listagem"
+                  : "/admin/dashboard/chamados_pendentes"
               }
               className="w-full bg-blue-200 py-1.5 rounded-md text-sm font-medium text-center text-blue-500"
             >

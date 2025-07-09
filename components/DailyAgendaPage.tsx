@@ -55,13 +55,9 @@ export default function DailyAgendaPage({
   console.log("appointments", appointments);
   console.log("meetingsForSelectedDay", meetingsForSelectedDay);
 
-  const apTest = []
-
-  // Se não há appointments, mostrar estado vazio
   if (appointments.length === 0) {
     return (
-      <div className="max-w-sm mx-auto min-h-screen flex flex-col">
-        {/* Navegação do mês */}
+      <div className="max-w-full mx-auto min-h-screen flex flex-col">
         <div className="flex items-center justify-between py-3">
           <button onClick={handlePrevMonth}>
             <ChevronLeft className="text-gray-700" />
@@ -74,7 +70,6 @@ export default function DailyAgendaPage({
           </button>
         </div>
 
-        {/* Calendário horizontal */}
         <div className="overflow-x-auto flex space-x-2 pb-4">
           {monthDays.map((date, idx) => {
             const isSelected = isSameDay(date, selectedDate);
@@ -118,7 +113,6 @@ export default function DailyAgendaPage({
 
   return (
     <div className="pb-4 flex flex-col min-h-screen">
-      {/* Navegação do mês */}
       <div className="flex items-center justify-between px-4 py-3">
         <button onClick={handlePrevMonth}>
           <ChevronLeft className="text-gray-700" />
@@ -131,7 +125,6 @@ export default function DailyAgendaPage({
         </button>
       </div>
 
-      {/* Calendário horizontal */}
       <div className="overflow-x-auto flex space-x-2 px-4 pb-2">
         {monthDays.map((date, idx) => {
           const isSelected = isSameDay(date, selectedDate);
@@ -154,7 +147,6 @@ export default function DailyAgendaPage({
         })}
       </div>
 
-      {/* Agenda */}
       <div className="overflow-y-auto flex-1 px-4">
         {fullHours.map((hour, idx) => {
           const meetings = meetingsForSelectedDay.filter((m) => {

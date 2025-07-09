@@ -8,23 +8,25 @@ export async function getAppointments(status?: string) {
 
   let query = supabase
     .from("video_services")
-    .select("id, client_name, subject, datetime, video_service_state, department_id, message")
+    .select(
+      "id, client_name, subject, datetime, video_service_state, department_id, message"
+    )
     .order("datetime", { ascending: true });
 
-    
-    if (status && status !== "all") {
-      query = query.eq("video_service_state", status);
-    }
-    
-    const { data, error } = await query;
-    
-    if (error) {
-      console.error("Erro ao buscar agendamentos:", error);
-      return [];
-    }
-    const departmentIds = Array.from(new Set(data.map((item) => item.department_id)));
+  if (status && status !== "all") {
+    query = query.eq("video_service_state", status);
+  }
 
-  // 2️⃣ Buscando todos os departamentos de uma vez
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Erro ao buscar agendamentos:", error);
+    return [];
+  }
+  const departmentIds = Array.from(
+    new Set(data.map((item) => item.department_id))
+  );
+
   const { data: departments, error: deptError } = await supabase
     .from("departments")
     .select("id, name")
@@ -34,12 +36,11 @@ export async function getAppointments(status?: string) {
     console.error("Erro ao buscar departamentos:", deptError);
     return [];
   }
-
-  // 3️⃣ Criando um Map para acesso rápido ao nome do departamento
+  
   const departmentMap = new Map(
     departments.map((dept) => [dept.id, dept.name])
   );
-    
+
   return data.map((item) => ({
     id: item.id.toString(),
     name: item.client_name,
@@ -94,13 +95,21 @@ export async function rescheduleAppointment(
 
   const { error } = await supabase
     .from("video_services")
-    .update({ datetime: localDateTimeString })
+    .update({ datetime: localDateTimeString, video_service_state: "in_progress" })
     .eq("id", appointmentId);
   if (error) {
     console.error("Erro ao reagendar chamada:", error);
     return;
   }
 
-  // Revalidar a home para refletir a alteração
   revalidatePath("/home");
+}
+
+export async function completeAppointment(id: string) {
+  const supabase = await createClient();
+
+  await supabase
+    .from("video_services")
+    .update({ video_service_state: "completed" })
+    .eq("id", id);
 }

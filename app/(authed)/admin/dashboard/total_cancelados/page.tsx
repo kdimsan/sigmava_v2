@@ -1,15 +1,16 @@
-"use client"
+"use client";
 
 import AppointmentList, { Appointment } from "@/components/AppointmentList";
 import BackButton from "@/components/BackButton";
 import React, { useEffect, useState } from "react";
+
+import ReassignModal from "@/components/ReassignModal";
 import {
   approveAppointment,
   cancelAppointment,
   getAppointments,
   rescheduleAppointment,
-} from "../dashboard/actions/appointments";
-import ReassignModal from "@/components/ReassignModal";
+} from "../actions/appointments";
 
 export default function TotalCancelledCalls() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -34,11 +35,6 @@ export default function TotalCancelledCalls() {
 
   const handleApprove = async (id: string) => {
     await approveAppointment(id);
-    await fetchAppointments();
-  };
-
-  const handleCancel = async (id: string) => {
-    await cancelAppointment(id);
     await fetchAppointments();
   };
 

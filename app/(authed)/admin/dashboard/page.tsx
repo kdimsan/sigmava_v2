@@ -8,6 +8,7 @@ import StatsCard from "@/components/StatsCard";
 import {
   approveAppointment,
   cancelAppointment,
+  completeAppointment,
   getAppointments,
   rescheduleAppointment,
 } from "./actions/appointments";
@@ -50,6 +51,11 @@ export default function Home() {
     await fetchAppointments(); 
   };
 
+  const handleCompleted = async ( id: string) => {
+    await completeAppointment(id);
+    await fetchAppointments();
+  }
+
   useEffect(() => {
     fetchAppointments();
   }, []);
@@ -63,6 +69,7 @@ export default function Home() {
             appointments={proximos}
             footerType="link"
             onCancel={handleCancel}
+            onComplete={handleCompleted}
             onReschedule={(appt) => setModalAppointment(appt)}
           />
           <AppointmentList
@@ -77,7 +84,7 @@ export default function Home() {
 
         <div className="space-y-6">
           <div>
-            <h2 className="text-lg font-semibold text-blue-600 mb-4">Agenda</h2>
+            <h2 className="text-lg font-semibold text-blue-600 my-3">Agenda</h2>
             <Calendar
               selectedDate={selectedDate}
               onDateSelect={setSelectedDate}

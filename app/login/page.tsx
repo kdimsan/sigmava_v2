@@ -3,23 +3,34 @@ import { login } from "./actions";
 
 export default function LoginPage() {
   return (
-    <main className="flex flex-col md:flex-row w-full min-h-screen">
+    <main className="flex flex-col items-center justify-center md:flex-row w-full min-h-screen">
       <div className="hidden md:flex w-full md:w-1/2 min-h-screen justify-center items-center p-6 md:p-10">
         <div className="flex flex-col gap-8 md:gap-16 items-center">
           <div className="w-full max-w-[100px] md:max-w-[100px] mx-auto">
             <img className="w-full h-auto mx-auto" src={"/sigmava_logo.png"} alt="Sigmava Logo" />
           </div>
-          <div className="w-full max-w-[800px] md:max-w-[900px] mx-auto">
-            <img className="w-full h-auto mx-auto" src={"/ilus_1.png"} alt="Illustration" />
+          <div>
+            {/* Imagem para telas pequenas */}
+            <img
+              className="block md:hidden w-[300px]"
+              src={"/ilus_1.png"}
+              alt="Ilustração"
+            />
+            {/* Imagem para tablet ou maior */}
+            <img
+              className="hidden md:block w-[570px]"
+              src={"/big-login.png"}
+              alt="Ilustração grande"
+            />
           </div>
         </div>
       </div>
-      <div className="w-full md:w-1/2 min-h-screen flex flex-col justify-start md:justify-center items-center px-4 py-6 md:p-10 pt-16 md:pt-6">
-        <div className="md:hidden w-full max-w-[150px] mb-8 mx-auto">
+      <div className="w-full md:w-1/2 min-h-screen flex flex-col justify-center md:justify-center items-center px-4 py-6 md:p-10 md:pt-6">
+        <div className="md:hidden w-full max-w-[120px] mb-8 mx-auto">
           <img className="w-full h-auto mx-auto" src={"/sigmava_logo.png"} alt="Sigmava Logo" />
         </div>
-        <span className="text-sm md:text-base">Entre na sua conta</span>
-        <h1 className="text-2xl md:text-[32px] max-w-[293px] text-center font-medium mb-6 md:mb-8">
+        <span className="text-xs text-blue-600 font-semibold place-self-start mt-8 md:text-sm md:place-self-center">Entre na sua conta</span>
+        <h1 className="text-2xl md:text-[32px] w-full text-start font-medium mb-6 md:text-center md:mb-8">
           <span className="text-blue-600 font-bold">
             A sua Câmara
             <br /> Municipal,

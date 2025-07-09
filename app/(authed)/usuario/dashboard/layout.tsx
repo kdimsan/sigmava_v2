@@ -24,7 +24,7 @@ export default async function UserLayout({
 
   const headerUser = {
     name: userProfile?.name!,
-    role: userProfile?.role!,
+    role: "user",
     avatar: data.user.user_metadata?.avatar_url,
   };
 
@@ -32,12 +32,13 @@ export default async function UserLayout({
     name: headerUser.name,
     avatar: headerUser.avatar,
     logo: "",
+    role: headerUser.role
   };
 
-  if (userProfile?.role !== "superuser") {
-    const logoUrl = await getLogoUrlByLicense(userProfile!.license_id);
-    userData.logo = logoUrl;
-  }
+  // if (userProfile?.role !== "superuser") {
+  //   const logoUrl = await getLogoUrlByLicense(userProfile!.license_id);
+  //   userData.logo = logoUrl;
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50 p-2">

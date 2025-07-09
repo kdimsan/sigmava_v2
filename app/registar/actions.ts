@@ -16,11 +16,10 @@ export async function registerUser(formData: FormData) {
     throw new Error("Todos os campos são obrigatórios");
   }
 
-  // 1. Criar conta no Supabase Auth
   const { data: user, error: authError } = await supabaseAdmin.auth.admin.createUser({
     email,
     password,
-    email_confirm: true, // já envia com email confirmado (ajuste conforme sua política)
+    email_confirm: true, 
   });
 
   if (authError) {
@@ -28,7 +27,6 @@ export async function registerUser(formData: FormData) {
     throw new Error("Erro ao criar conta.");
   }
 
-  // 2. Inserir na tabela clients
   const { error: dbError } = await (await supabase)
     .from("clients")
     .insert([{ name, email, license_id: licenseId }]);
@@ -37,7 +35,4 @@ export async function registerUser(formData: FormData) {
     console.error("Erro ao criar cliente:", dbError);
     throw new Error("Erro ao salvar dados no banco.");
   }
-
-  // Redirecionar após sucesso
-  redirect("/login"); // Ou onde você quiser
 }

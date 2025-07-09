@@ -42,7 +42,7 @@ export default function StatsCard({
         </div>
 
         <div className="mb-4 bg-white rounded-b-md">
-          <div className="text-center pt-5">
+          <div className="text-center py-5">
           <div className="mx-auto w-fit mb-2">{color === "call" ? <div className="bg-green-500 p-2.5 rounded-full"><CallGreen /></div> : <Dismiss />}</div>
             <div className={`text-sm font-medium text-gray-300 mb-1`}>
               Video Atendimentos
@@ -53,7 +53,7 @@ export default function StatsCard({
 
             {showViewAll && (
               <Link
-              href={color === "call" ? `/home/total_efetuados` : `/home/total_cancelados`}
+              href={color === "call" ? `/admin/dashboard/total_efetuados` : `/admin/dashboard/total_cancelados`}
                 className={`text-sm ${classes.text} hover:underline m-4 font-medium transition-all`}
               >
                 Ver todos ›

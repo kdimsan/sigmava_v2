@@ -9,12 +9,11 @@ export async function getLogoUrlByLicense(license_id: number) {
     .from("logo_files")
     .select("path")
     .eq("license_id", license_id)
-    .order("created_at", { ascending: false }) // pega a logo mais recente, se houver mais de uma
+    .order("created_at", { ascending: false }) 
     .limit(1)
     .single();
 
   if (error) {
-    console.error("Erro ao buscar logo:", error);
     return null;
   }
 

@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { Plus, Search } from "lucide-react";
-import LicenseTable from "@/components/LicenseTable";
+import LicenseTable, { License } from "@/components/LicenseTable";
 import Modal from "@/components/Modal";
 
 export default function SuperUserPage() {
   const [showCreateLicense, setShowCreateLicense] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingLicense, setEditingLicense] = useState<License | null>(null);
 
   // if (loading) {
   //   return (
@@ -51,13 +52,9 @@ export default function SuperUserPage() {
               <span>Nova Licença</span>
             </button>
           </div>
-
-          {/* Licenses Table */}
           <LicenseTable />
         </div>
       </main>
-
-      {/* Create License Modal */}
       {showCreateLicense && (
         <Modal onClose={() => setShowCreateLicense(false)} />
       )}

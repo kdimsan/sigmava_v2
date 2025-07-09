@@ -8,12 +8,13 @@ import UsersAdd from "@/assets/svgs/usersAdd";
 import Clock from "@/assets/svgs/clock";
 import Bell from "@/assets/svgs/bell";
 import User from "@/assets/svgs/user";
-import { useState } from "react";
+import React, { useState } from "react";
 import CreateUserForm from "./forms/createUserForm";
 import PopoverItem from "./PopoverItem";
 import Department from "./forms/department";
 import Availability from "./forms/avaiability";
 import Link from "next/link";
+import Profile from "../Profile";
 
 interface DepartmentProps {
   id: number;
@@ -60,10 +61,10 @@ export default function Header({ user, departments }: HeaderProps) {
     {
       icon: User,
       label: "O SEU PERFIL",
-      onClick: () => setActiveForm("profile"),
+      content: <Profile department={user.role!} name={user.name} />,
     },
   ];
-  console.log("header user",user);
+  console.log("header user", user);
 
   if (user.role === "superuser") {
     return (
@@ -91,6 +92,21 @@ export default function Header({ user, departments }: HeaderProps) {
       </header>
     );
   }
+
+  const filteredNavigationItems =
+    user.role === "user"
+      ? navigationItems.filter(
+          (item) =>
+            item.label === "NOTIFICAÇÕES" || item.label === "O SEU PERFIL"
+        )
+      : user.role === "employee"
+      ? navigationItems.filter(
+          (item) =>
+            item.label === "NOTIFICAÇÕES" ||
+            item.label === "O SEU PERFIL" ||
+            item.label === "DISPONIBILIDADE"
+        )
+      : navigationItems;
 
   return (
     <header className="bg-white border-b border-gray-200 w-11/12 my-2.5 mx-auto rounded-md px-6 py-4">
@@ -145,8 +161,8 @@ export default function Header({ user, departments }: HeaderProps) {
 
         {/* Menu Superior */}
         <div className="flex items-center space-x-6">
-          {navigationItems.map((item, i) => {
-            const isActive = activeForm === item.label.toLowerCase(); // Ex: "utilizadores"
+          {filteredNavigationItems.map((item, i) => {
+            const isActive = activeForm === item.label.toLowerCase();
 
             return (
               <PopoverItem
@@ -162,15 +178,15 @@ export default function Header({ user, departments }: HeaderProps) {
                 trigger={
                   <button
                     className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors
-          ${
-            isActive
-              ? "border-2 border-blue-500 bg-blue-50 text-blue-500"
-              : "hover:bg-blue-100/80 border-2 border-transparent"
-          }`}
+              ${
+                isActive
+                  ? "border-2 border-blue-500 bg-blue-50 text-blue-500"
+                  : "hover:bg-blue-100/80 border-2 border-transparent"
+              }`}
                   >
                     <item.icon />
                     <span
-                      className={`text-xs  ${
+                      className={`text-xs ${
                         isActive ? "text-blue-600" : "text-gray-600"
                       }`}
                     >
@@ -179,8 +195,17 @@ export default function Header({ user, departments }: HeaderProps) {
                   </button>
                 }
               >
-                {item.content}
-                
+                {({ close }) =>
+                  // Adaptação: passa 'close' como onCancel apenas se o conteúdo for um formulário
+                  React.isValidElement(item.content)
+                    ? React.cloneElement(
+                        item.content as React.ReactElement<{
+                          onCancel: () => void;
+                        }>,
+                        { onCancel: close }
+                      )
+                    : item.content
+                }
               </PopoverItem>
             );
           })}

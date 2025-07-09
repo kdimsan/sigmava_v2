@@ -3,13 +3,9 @@
 import AppointmentList, { Appointment } from "@/components/AppointmentList";
 import BackButton from "@/components/BackButton";
 import React, { useEffect, useState } from "react";
-import {
-  approveAppointment,
-  cancelAppointment,
-  getAppointments,
-  rescheduleAppointment,
-} from "../dashboard/actions/appointments";
+
 import ReassignModal from "@/components/ReassignModal";
+import { approveAppointment, cancelAppointment, getAppointments, rescheduleAppointment } from "../actions/appointments";
 
 export default function TotalMadeCalls() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -32,16 +28,6 @@ export default function TotalMadeCalls() {
     setModalAppointment(null);
   };
 
-  const handleApprove = async (id: string) => {
-    await approveAppointment(id);
-    await fetchAppointments();
-  };
-
-  const handleCancel = async (id: string) => {
-    await cancelAppointment(id);
-    await fetchAppointments();
-  };
-
   useEffect(() => {
     fetchAppointments();
   }, []);
@@ -60,15 +46,6 @@ export default function TotalMadeCalls() {
           />
         </div>
       </div>
-      {modalAppointment && (
-        <ReassignModal
-          isOpen={!!modalAppointment}
-          onClose={() => setModalAppointment(null)}
-          onConfirm={(date, time) =>
-            handleReschedule(modalAppointment, date, time)
-          }
-        />
-      )}
     </main>
   );
 }

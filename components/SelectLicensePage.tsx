@@ -1,14 +1,14 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Select from "@/components/Form/select";
 import { registerUser } from "@/app/registar/actions";
+import toast from "react-hot-toast";
 
 interface License {
   id: string;
   name: string;
-  // outros campos, se houver
 }
 
 interface Props {
@@ -20,18 +20,28 @@ export default function SelectLicensePage({ licenses }: Props) {
   const email = params.get("email");
   const name = params.get("name");
   const password = params.get("password");
+  const router = useRouter();
 
   const [license, setLicense] = useState("");
 
   const licenseOptions = licenses.map((license) => ({
-    value: license.id,
+    value: String(license.id),
     label: license.name,
   }));
 
-  console.log("SEL", license);
+  const handleSubmit = async (formData: FormData) => {
+    try {
+      await registerUser(formData);
+      toast.success("Registo concluído com sucesso!");
+      setTimeout(() => router.push("/login"), 1000);
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao finalizar o registo.");
+    }
+  };
 
   return (
-    <main className="flex flex-col p-10 md:flex-row w-full min-h-screen">
+    <main className="flex flex-col p-10  w-full min-h-screen md:flex-row md:items-center">
       <div className="flex w-full md:w-1/2 h-full justify-center items-center">
         <div className="flex flex-col gap-[76px]">
           <div className="w-full mx-auto">
@@ -42,15 +52,20 @@ export default function SelectLicensePage({ licenses }: Props) {
           </div>
         </div>
       </div>
-      <div className="w-full md:w-1/2 h-full flex flex-col justify-center items-center md:-mt-10 md:px-10">
-        <span>Só mais um passo</span>
-        <h1 className="text-[32px] max-w-[293px] text-center font-medium mb-8">
+      <div className="w-full max-w-[372px] h-full flex flex-col justify-center items-center md:max-w-[450px] md:w-1/2 md:-mt-10 md:px-10">
+        <span className="text-xs text-blue-600 font-semibold place-self-start mt-8 lg:place-self-center">
+          Só mais um passo
+        </span>
+        <h1 className="text-[32px] w-full text-start font-medium mb-8 lg:text-center">
           <span className="text-gray-400 font-light">Selecione a sua</span>
           <span className=" text-blue-600 font-bold"> Câmara Municipal</span>
         </h1>
-
         <form
-          action={registerUser}
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            await handleSubmit(formData);
+          }}
           className="w-full flex flex-col gap-4 items-center"
         >
           <input type="hidden" name="email" value={email ?? ""} />

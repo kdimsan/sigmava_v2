@@ -1,34 +1,29 @@
-
-import { redirect } from 'next/navigation'
-import Header from '@/components/Header/Header'
-import { createClient } from '@/utils/supabase/server'
-import { checkIfSuperUser, getUserProfile } from '@/lib/auth'
-import { getDepartments } from '../../admin/dashboard/actions/departments'
-import { getLogoUrlByLicense } from '../../actions/getLicenseLogo'
-
+import { redirect } from "next/navigation";
+import Header from "@/components/Header/Header";
+import { createClient } from "@/utils/supabase/server";
+import { checkIfSuperUser, getUserProfile } from "@/lib/auth";
+import { getDepartments } from "../../admin/dashboard/actions/departments";
+import { getLogoUrlByLicense } from "../../actions/getLicenseLogo";
 
 export default async function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-
-
-    const supabase = await createClient()
-    const { data, error } = await supabase.auth.getUser()
-    if (error || !data?.user) {
-      redirect('/login')
-    }
-
-    const userProfile = await getUserProfile(data.user.id);
-    const departments = await getDepartments();
-       
-  // Preparar dados do usuário para o Header
-  const headerUser = {
-    name: userProfile?.full_name || data.user.email?.split('@')[0] || 'Usuário',
-    role: userProfile?.role!,
-    avatar: data.user.user_metadata?.avatar_url
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) {
+    redirect("/login");
   }
+
+  const userProfile = await getUserProfile(data.user.id);
+  const departments = await getDepartments();
+
+  const headerUser = {
+    name: userProfile?.full_name || data.user.email?.split("@")[0] || "Usuário",
+    role: userProfile?.role!,
+    avatar: data.user.user_metadata?.avatar_url,
+  };
 
   let userData = {
     name: headerUser.name,
@@ -37,20 +32,17 @@ export default async function DashboardLayout({
     logo: "",
   };
 
-  if (userProfile?.role !== 'superuser') {
+  if (userProfile?.role !== "superuser") {
     const logoUrl = await getLogoUrlByLicense(userProfile!.license_id);
     userData.logo = logoUrl;
   }
 
-
   return (
     <div className="min-h-screen bg-gray-50 p-2">
       <Header user={userData} departments={departments} />
-      
-      <main className="flex-1">
-        {children}
-      </main>
-      
+
+      <main className="flex-1">{children}</main>
+
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 p-4">
         <div className="text-center">
@@ -59,5 +51,5 @@ export default async function DashboardLayout({
         </div>
       </footer>
     </div>
-  )
+  );
 }

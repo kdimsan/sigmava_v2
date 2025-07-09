@@ -1,4 +1,4 @@
-import ProfileSettings from "@/components/ProfilePage";
+import ProfileSettings from "@/components/ProfileSettings";
 import { getUser } from "../actions/user";
 import { getLicenses } from "@/app/(authed)/superuser/dashboard/actions/licenses";
 

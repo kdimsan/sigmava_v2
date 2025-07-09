@@ -2,19 +2,30 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="flex flex-col p-10 md:flex-row w-full min-h-screen">
-      <div className="flex w-full md:w-1/2 h-full justify-center items-center">
+    <main className="flex flex-col p-10 w-full min-h-screen md:flex-row md:items-center">
+      <div className="flex w-full h-full justify-center items-center md:w-1/2 md:">
         <div className="flex flex-col gap-[76px]">
           <div className="w-full mx-auto">
             <img className="mx-auto" src={"/sigmava_logo.png"} />
           </div>
-          <div className="w-[300px]">
-            <img className="w-full" src={"/ilus_1.png"} />
+          <div>
+            {/* Imagem para telas pequenas */}
+            <img
+              className="block md:hidden w-[300px]"
+              src={"/ilus_1.png"}
+              alt="Ilustração"
+            />
+            {/* Imagem para tablet ou maior */}
+            <img
+              className="hidden md:block w-[570px]"
+              src={"/big-login.png"}
+              alt="Ilustração grande"
+            />
           </div>
         </div>
       </div>
       <div className="w-full md:w-1/2 h-full flex flex-col justify-center items-center md:-mt-10 md:px-10">
-        <h1 className="text-[32px] max-w-[293px] text-center font-medium mb-8">
+        <h1 className="text-[32px] w-full text-start font-medium mb-8">
           <span className="text-blue-600 font-bold">
             A sua Câmara
             <br /> Municipal,

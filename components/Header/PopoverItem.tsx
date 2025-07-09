@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 
 interface Props {
   trigger: ReactNode;
-  children: ReactNode;
+  children: ReactNode | ((props: { close: () => void }) => ReactNode);
   isActive: boolean;
   onToggle: () => void;
 }
@@ -27,11 +27,11 @@ export default function PopoverItem({ trigger, children, isActive, onToggle }: P
       <Popover.Portal>
         <Popover.Content
           side="bottom"
-          align="start"
+          align="end"
           sideOffset={8}
-          className="z-50 bg-white border shadow-md rounded-lg p-4 w-[400px]"
+          className="z-50 bg-white border shadow-md rounded-lg p-4 w-[400px] max-w-[calc(100vw-2rem)] mx-auto"
         >
-          {children}
+          {typeof children === "function" ? children({ close: onToggle }) : children}
           <Popover.Arrow className="fill-white" />
         </Popover.Content>
       </Popover.Portal>

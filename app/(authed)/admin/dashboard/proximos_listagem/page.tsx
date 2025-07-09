@@ -2,13 +2,9 @@
 import AppointmentList, { Appointment } from "@/components/AppointmentList";
 import BackButton from "@/components/BackButton";
 import React, { useEffect, useState } from "react";
-import {
-  approveAppointment,
-  cancelAppointment,
-  getAppointments,
-  rescheduleAppointment,
-} from "../dashboard/actions/appointments";
+
 import ReassignModal from "@/components/ReassignModal";
+import { approveAppointment, cancelAppointment, getAppointments, rescheduleAppointment } from "../actions/appointments";
 
 export default function NextList() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -29,16 +25,6 @@ export default function NextList() {
     await rescheduleAppointment(appt.id, newDate, newTime);
     await fetchAppointments();
     setModalAppointment(null);
-  };
-
-  const handleApprove = async (id: string) => {
-    await approveAppointment(id);
-    await fetchAppointments();
-  };
-
-  const handleCancel = async (id: string) => {
-    await cancelAppointment(id);
-    await fetchAppointments();
   };
 
   useEffect(() => {
