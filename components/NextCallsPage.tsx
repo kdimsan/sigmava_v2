@@ -1,7 +1,11 @@
 "use client";
+
 import { Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import React, { useState } from "react";
 import AppointmentCard from "./appointmentCard";
+import { formatDate } from "@/utils/formats";
+import { cancelAppointment } from "@/app/(authed)/admin/dashboard/actions/appointments";
+import toast from "react-hot-toast";
 
 interface Appointment {
   id: string;
@@ -9,48 +13,20 @@ interface Appointment {
   subject: string;
   message: string;
   time: string;
-  date: string;
+  datetime: string;
   department: string;
-  status: "scheduled" | "in_progress" | "cancelled" | "completed";
+  video_service_state: "scheduled" | "in_progress" | "cancelled" | "completed";
 }
 
 interface Appointments {
   appointments: Appointment[];
 }
 
-const statusConfig = {
-  scheduled: {
-    label: "ACEITE",
-    color: "bg-blue-50 text-blue-700 border-blue-200",
-  },
-  in_progress: {
-    label: "EM PROGRESSO",
-    color: "bg-green-50 text-green-700 border-green-200",
-  },
-  cancelled: {
-    label: "CANCELADO",
-    color: "bg-red-50 text-red-700 border-red-200",
-  },
-  completed: {
-    label: "CONCLUÍDO",
-    color: "bg-gray-50 text-gray-700 border-gray-200",
-  },
-};
-
 export default function NextCallsPage({ appointments }: Appointments) {
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const formattedDate = date
-      .toLocaleDateString("pt-PT", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "2-digit",
-      })
-      .replace(/\//g, ".");
-    return formattedDate;
-  };
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [localAppointments, setLocalAppointments] =
+    useState<Appointment[]>(appointments);
 
   const toggleExpanded = (id: string) => {
     const newExpanded = new Set(expandedCards);
@@ -62,16 +38,22 @@ export default function NextCallsPage({ appointments }: Appointments) {
     setExpandedCards(newExpanded);
   };
 
-  const handleCancel = (id: string) => {
-    console.log("Cancelando agendamento:", id);
-    // Adicione sua lógica de cancelamento aqui
+  const handleCancel = async (id: string) => {
+    try {
+      setLoadingId(id);
+      await cancelAppointment(id);
+      toast.success("Cancelado com sucesso!");
+      setLocalAppointments((prev) => prev.filter((appt) => appt.id !== id));
+    } catch (error) {
+      toast.error("Erro ao cancelar.");
+    } finally {
+      setLoadingId(null);
+    }
   };
-
-  
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
-      {appointments.map((appointment)  => (
+      {localAppointments.map((appointment) => (
         <AppointmentCard
           key={appointment.id}
           appointment={appointment}
@@ -79,6 +61,7 @@ export default function NextCallsPage({ appointments }: Appointments) {
           onToggle={() => toggleExpanded(appointment.id)}
           onCancel={() => handleCancel(appointment.id)}
           formatDate={formatDate}
+          isLoading={loadingId === appointment.id}
         />
       ))}
     </div>

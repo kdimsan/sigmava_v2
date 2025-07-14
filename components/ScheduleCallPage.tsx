@@ -16,6 +16,7 @@ interface Department {
 }
 
 export interface AvailabilitySlot {
+  duration: number;
   id: number;
   user_id: string;
   start_time: string;
@@ -24,25 +25,35 @@ export interface AvailabilitySlot {
   available: boolean;
   created_at: string;
   updated_at: string;
+  department_id: string;
 }
 
 interface ScheduleCallPageProps {
   departaments: Department[];
   slots: AvailabilitySlot[];
+  licenseId: number; // Novo!
 }
+
+
 
 export default function ScheduleCallPage({
   departaments,
-  slots,
+  slots: initialSlots,
+  licenseId,
 }: ScheduleCallPageProps) {
   const [dep, setDep] = useState("");
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
+  const [slots, setSlots] = useState<AvailabilitySlot[]>(initialSlots);
 
   const router = useRouter();
 
+  const filteredSlots = slots.filter(
+    (slot) => String(slot.department_id) === String(dep)
+  );
+
   const availableDates = Array.from(
-    new Set(slots.map((slot) => slot.date))
+    new Set(filteredSlots.map((slot) => slot.date))
   ).map((dateStr) => new Date(dateStr));
 
   const departmentOptions = departaments.map((d) => ({
@@ -54,15 +65,65 @@ export default function ScheduleCallPage({
     ? selectedDays[0].toLocaleDateString("sv-SE")
     : "";
 
-  const availableHours = slots.filter((slot) => slot.date === selectedDateStr);
+  const availableHours = filteredSlots.filter(
+    (slot) => slot.date === selectedDateStr
+  );
 
-  const timeSlotOptions = availableHours.map((slot) => ({
-    label: `${slot.start_time} às ${slot.end_time}`,
-    value: `${slot.id}|${slot.start_time}|${slot.end_time}`,
-  }));
+  const timeSlotOptions = availableHours.flatMap((slot) => {
+    const duration = slot.duration || 15; // pega duração do slot, ou 15 min padrão
+    const intervals = generateTimeIntervals(slot.start_time, slot.end_time, duration);
+  
+    return intervals.map((time) => ({
+      label: time,
+      value: `${slot.id}|${time}`,
+    }));
+  });
+
+  function generateTimeIntervals(startTime: string, endTime: string, duration: number): string[] {
+    const intervals = [];
+    const [startH, startM] = startTime.split(":").map(Number);
+    const [endH, endM] = endTime.split(":").map(Number);
+  
+    let current = new Date();
+    current.setHours(startH, startM, 0, 0);
+  
+    const end = new Date();
+    end.setHours(endH, endM, 0, 0);
+  
+    while (current.getTime() + duration * 60000 <= end.getTime()) {
+      const hh = current.getHours().toString().padStart(2, "0");
+      const mm = current.getMinutes().toString().padStart(2, "0");
+      intervals.push(`${hh}:${mm}`);
+  
+      current = new Date(current.getTime() + duration * 60000);
+    }
+  
+    return intervals;
+  }
+
+  async function loadSlots(departmentId: string) {
+    try {
+      const res = await fetch("/api/availability", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ licenseId, departmentId }),
+      });
+
+      if (!res.ok) throw new Error("Erro ao buscar slots");
+
+      const data = await res.json();
+      console.log("data", data);
+
+      setSlots(data);
+      setSelectedDays([]);
+      setSelectedTimeSlot("");
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
-    <main className="min-h-screen px-4 pt-6 pb-20 max-w-4xl mx-auto">
+    <main className="min-h-screen px-4 pb-20 max-w-5xl mx-auto">
       <PageHeader title="Agendar" subtitle="Video Atendimentos" />
 
       <form
@@ -72,7 +133,10 @@ export default function ScheduleCallPage({
         <div className="space-y-6">
           <Select
             value={dep}
-            onChange={setDep}
+            onChange={(value) => {
+              setDep(value);
+              loadSlots(value);
+            }}
             label="Departamento"
             options={departmentOptions}
             name="department"
@@ -102,17 +166,20 @@ export default function ScheduleCallPage({
               selected={selectedDays[0]}
               onSelect={(date) => {
                 setSelectedDays(date ? [date] : []);
-                setSelectedTimeSlot(""); // Limpa o horário ao mudar o dia
+                setSelectedTimeSlot("");
               }}
-              className="border rounded-md p-2 mt-1 bg-white max-w-[400px] flex items-center justify-center"
+              className="border border-gray-200 rounded-md p-2 mt-1 bg-white max-w-[400px] flex items-center justify-center"
               disabled={(date) =>
                 !availableDates.some(
-                  (d) => d.toDateString() === date.toDateString()
+                  (d) =>
+                    d.getFullYear() === date.getFullYear() &&
+                    d.getMonth() === date.getMonth() &&
+                    d.getDate() === date.getDate()
                 )
               }
             />
             {selectedDays.map((date, i) => (
-              <input
+              <Input
                 key={i}
                 type="hidden"
                 name="calendarDates[]"
@@ -125,12 +192,12 @@ export default function ScheduleCallPage({
             <label className="text-sm font-medium">Horários Disponíveis</label>
             {timeSlotOptions.length > 0 ? (
               <SelectField
-                label="Horários Disponíveis"
                 options={timeSlotOptions}
                 value={selectedTimeSlot}
                 onChange={setSelectedTimeSlot}
                 placeholder="Selecione um horário"
                 name="selectedTimeSlot"
+                className="max-w-[400px]"
               />
             ) : (
               <p className="text-sm text-gray-500 mt-2">

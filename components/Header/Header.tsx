@@ -1,12 +1,11 @@
 "use client";
 
-import { Building2 } from "lucide-react";
+import { CalendarDays, History, PlusCircleIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LogoutButton from "../LogoutButton";
 import UserAdd from "@/assets/svgs/userAdd";
 import UsersAdd from "@/assets/svgs/usersAdd";
 import Clock from "@/assets/svgs/clock";
-import Bell from "@/assets/svgs/bell";
 import User from "@/assets/svgs/user";
 import React, { useState } from "react";
 import CreateUserForm from "./forms/createUserForm";
@@ -54,13 +53,27 @@ export default function Header({ user, departments }: HeaderProps) {
       content: <Availability />,
     },
     {
-      icon: Bell,
-      label: "NOTIFICAÇÕES",
-      onClick: () => setActiveForm("notifications"),
+      icon: PlusCircleIcon,
+      label: "AGENDAR CHAMADA",
+      isLucide: true,
+      path: "/usuario/dashboard/agendar-chamada",
+    },
+    {
+      icon: History,
+      label: "HISTÓRICO",
+      isLucide: true,
+      path: "/usuario/dashboard/historico",
+    },
+    {
+      icon: CalendarDays,
+      label: "PRÓXIMOS",
+      isLucide: true,
+      path: "/usuario/dashboard/proximas-chamadas",
     },
     {
       icon: User,
       label: "O SEU PERFIL",
+      path: "/usuario/dashboard/definicoes",
       content: <Profile department={user.role!} name={user.name} />,
     },
   ];
@@ -97,7 +110,10 @@ export default function Header({ user, departments }: HeaderProps) {
     user.role === "user"
       ? navigationItems.filter(
           (item) =>
-            item.label === "NOTIFICAÇÕES" || item.label === "O SEU PERFIL"
+            item.label === "AGENDAR CHAMADA" ||
+            item.label === "HISTÓRICO" ||
+            item.label === "PRÓXIMOS" ||
+            item.label === "O SEU PERFIL"
         )
       : user.role === "employee"
       ? navigationItems.filter(
@@ -106,11 +122,11 @@ export default function Header({ user, departments }: HeaderProps) {
             item.label === "O SEU PERFIL" ||
             item.label === "DISPONIBILIDADE"
         )
-      : navigationItems;
+      : navigationItems.filter((item) => !item.isLucide);
 
   return (
     <header className="bg-white border-b border-gray-200 w-11/12 my-2.5 mx-auto rounded-md px-6 py-4">
-      <div className="flex items-center justify-between">
+      <div className=" items-center justify-between hidden md:flex">
         {/* Logo e Info do Usuário */}
         <div className="flex items-center space-x-4">
           <button
@@ -164,27 +180,37 @@ export default function Header({ user, departments }: HeaderProps) {
           {filteredNavigationItems.map((item, i) => {
             const isActive = activeForm === item.label.toLowerCase();
 
+            const handleClick = () => {
+              if (user.role === "user" && item.path) {
+                router.push(item.path);
+              } else {
+                setActiveForm(
+                  isActive
+                    ? null
+                    : (item.label.toLowerCase() as typeof activeForm)
+                );
+              }
+            };
+
             return (
               <PopoverItem
                 key={i}
                 isActive={isActive}
-                onToggle={() =>
-                  setActiveForm(
-                    isActive
-                      ? null
-                      : (item.label.toLowerCase() as typeof activeForm)
-                  )
-                }
+                onToggle={handleClick}
                 trigger={
                   <button
                     className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors
-              ${
-                isActive
-                  ? "border-2 border-blue-500 bg-blue-50 text-blue-500"
-                  : "hover:bg-blue-100/80 border-2 border-transparent"
-              }`}
+            ${
+              isActive
+                ? "border-2 border-blue-500 bg-blue-50 text-blue-500"
+                : "hover:bg-blue-100/80 border-2 border-transparent"
+            }`}
                   >
-                    <item.icon />
+                    <item.icon
+                      className={
+                        item.isLucide ? "w-5 h-5 text-blue-500" : undefined
+                      }
+                    />
                     <span
                       className={`text-xs ${
                         isActive ? "text-blue-600" : "text-gray-600"
@@ -195,22 +221,27 @@ export default function Header({ user, departments }: HeaderProps) {
                   </button>
                 }
               >
-                {({ close }) =>
-                  // Adaptação: passa 'close' como onCancel apenas se o conteúdo for um formulário
-                  React.isValidElement(item.content)
-                    ? React.cloneElement(
-                        item.content as React.ReactElement<{
-                          onCancel: () => void;
-                        }>,
-                        { onCancel: close }
-                      )
-                    : item.content
-                }
+                {user.role !== "user" && item.content
+                  ? ({ close }: { close: () => void }) =>
+                      React.isValidElement(item.content)
+                        ? React.cloneElement(
+                            item.content as React.ReactElement<{
+                              onCancel: () => void;
+                            }>,
+                            { onCancel: close }
+                          )
+                        : item.content
+                  : null}
               </PopoverItem>
             );
           })}
           <LogoutButton />
         </div>
+      </div>
+      <div className="flex flex-col md:hidden">
+        <span>Bem vindo {user.name} </span>
+        <span>ao SIGMAVA</span>
+
       </div>
     </header>
   );

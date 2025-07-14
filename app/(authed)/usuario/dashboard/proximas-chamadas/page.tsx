@@ -26,7 +26,7 @@ export default async function NextCalls() {
         className="px-1.5"
       />
         <p className="text-xl font-semibold text-blue-600">
-          Não têm marcações para <span className="text-blue-800">este dia</span>,
+          Não têm marcações agendadas,
         </p>
         <p className="text-gray-400 mt-1">
           faça já a sua marcação.
@@ -35,7 +35,7 @@ export default async function NextCalls() {
     );
   }
   return (
-    <main>
+    <main className="max-w-5xl mx-auto px-6">
       <PageHeader
         title="Próximos "
         subtitle="Video Atendimentos"

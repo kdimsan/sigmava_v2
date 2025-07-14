@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Modal from "./Modal"; // ajuste o caminho conforme seu projeto
+import Modal from "./Modal";
 import { createClient } from "@/utils/supabase/client";
 import {
-  Calendar,
   CheckCircle,
   Edit,
   Eye,
@@ -28,11 +27,6 @@ export interface License {
   contributing_number: string;
   saga: string;
   abey: string;
-}
-
-interface LicenseTableProps {
-  searchTerm: string;
-  onEditLicense: (license: License) => void;
 }
 
 export default function LicenseTable() {
@@ -105,9 +99,6 @@ export default function LicenseTable() {
                   Utilizadores Disponíveis
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Validade
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -149,16 +140,7 @@ export default function LicenseTable() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {license.available_users}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex items-center space-x-1">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                      <span>
-                        {new Date(license.expires_at).toLocaleDateString(
-                          "pt-BR"
-                        )}
-                      </span>
-                    </div>
-                  </td>
+                  
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button
@@ -210,7 +192,9 @@ export default function LicenseTable() {
 
       {editingLicense && (
         <Modal
-          onClose={() => setEditingLicense(null)}
+          onClose={() => {
+            fetchLicenses();
+            setEditingLicense(null)}}
           licenseToEdit={editingLicense}
           onUpdate={() => {
             fetchLicenses();

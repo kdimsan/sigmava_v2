@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "@/components/Header/Header";
 import Calendar from "@/components/Calendar";
 import AppointmentList, { Appointment } from "@/components/AppointmentList";
 import StatsCard from "@/components/StatsCard";
@@ -9,7 +8,7 @@ import {
   approveAppointment,
   cancelAppointment,
   completeAppointment,
-  getAppointments,
+  getAppointmentsByOwnerId,
   rescheduleAppointment,
 } from "./actions/appointments";
 import ReassignModal from "@/components/ReassignModal";
@@ -20,15 +19,32 @@ export default function Home() {
     null
   );
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [daysWithEvents, setDaysWithEvents] = useState<string[]>([]);
 
-  const proximos = appointments.filter((a) => a.status === "scheduled");
-  const pendentes = appointments.filter((a) => a.status === "in_progress");
-  const cancelados = appointments.filter((a) => a.status === "cancelled");
-  const completados = appointments.filter((a) => a.status === "completed");
+  const proximos = appointments.filter(
+    (a) => a.video_service_state === "scheduled"
+  );
+  const pendentes = appointments.filter(
+    (a) => a.video_service_state === "in_progress"
+  );
+  const cancelados = appointments.filter(
+    (a) => a.video_service_state === "cancelled"
+  );
+  const completados = appointments.filter(
+    (a) => a.video_service_state === "completed"
+  );
 
   const fetchAppointments = async () => {
-    const data = await getAppointments();
+    const data = await getAppointmentsByOwnerId();
     setAppointments(data);
+
+    const dates = data.map((appt) => {
+      const d = new Date(appt.datetime || appt.datetime); // ajuste conforme seu campo real
+      return d.toISOString().split("T")[0];
+    });
+
+    const uniqueDates = Array.from(new Set(dates));
+    setDaysWithEvents(uniqueDates);
   };
 
   const handleReschedule = async (
@@ -43,18 +59,18 @@ export default function Home() {
 
   const handleApprove = async (id: string) => {
     await approveAppointment(id);
-    await fetchAppointments(); 
+    await fetchAppointments();
   };
 
   const handleCancel = async (id: string) => {
     await cancelAppointment(id);
-    await fetchAppointments(); 
+    await fetchAppointments();
   };
 
-  const handleCompleted = async ( id: string) => {
+  const handleCompleted = async (id: string) => {
     await completeAppointment(id);
     await fetchAppointments();
-  }
+  };
 
   useEffect(() => {
     fetchAppointments();
@@ -86,6 +102,7 @@ export default function Home() {
           <div>
             <h2 className="text-lg font-semibold text-blue-600 my-3">Agenda</h2>
             <Calendar
+              daysWithEvents={daysWithEvents}
               selectedDate={selectedDate}
               onDateSelect={setSelectedDate}
             />

@@ -96,7 +96,7 @@ export default function DailyAgendaPage({
         <div className="flex-1 flex flex-col items-center justify-center px-8 py-12 bg-gray-50">
           <div className="text-center mb-8">
             <h2 className="text-xl font-semibold text-blue-600 mb-2">
-              Não têm marcações para este dia,{" "}
+              Não têm marcações,{" "}
               <span className="text-gray-500">faça já a sua marcação.</span>
             </h2>
           </div>

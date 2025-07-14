@@ -7,14 +7,14 @@ import Dismiss from "@/assets/svgs/dismiss";
 import Calendar from "@/assets/svgs/calendar";
 import Link from "next/link";
 import Check from "@/assets/svgs/check";
+import { formatDate, formatTime } from "@/utils/formats";
 
 export interface Appointment {
   id: string;
-  time: string;
-  date: string;
-  name: string;
+  datetime: string
+  client_name: string;
   subject: string;
-  status: "scheduled" | "in_progress" | "cancelled" | "pending" | "completed";
+  video_service_state: "scheduled" | "in_progress" | "cancelled" | "pending" | "completed";
 }
 
 interface AppointmentListProps {
@@ -83,22 +83,18 @@ export default function AppointmentList({
                   </td>
                   <td className="py-3">
                     <span className="text-sm text-gray-900">
-                      {new Date(appointment.date).toLocaleDateString("pt-PT", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })}
+                      {formatDate(appointment.datetime)}
                     </span>
                   </td>
 
                   <td className="py-3">
                     <span className="text-sm text-gray-900">
-                      {appointment.time}
+                      {formatTime(appointment.datetime)}
                     </span>
                   </td>
                   <td className="py-3">
                     <span className="text-sm text-gray-900">
-                      {appointment.name}
+                      {appointment.client_name}
                     </span>
                   </td>
                   <td className="py-3">
@@ -110,7 +106,7 @@ export default function AppointmentList({
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={
-                          appointment.status === "in_progress"
+                          appointment.video_service_state === "in_progress"
                             ? () => onApprove?.(appointment.id)
                             : () => onComplete?.(appointment.id)
                         }
@@ -121,7 +117,7 @@ export default function AppointmentList({
                         }`}
                         title="Aprovar"
                       >
-                        {appointment.status === "in_progress" ? (
+                        {appointment.video_service_state === "in_progress" ? (
                           <Check />
                         ) : (
                           <CallGreen />

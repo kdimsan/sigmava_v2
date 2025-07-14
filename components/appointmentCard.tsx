@@ -1,3 +1,4 @@
+import { formatTime } from "@/utils/formats";
 import { Calendar, ChevronDown, ChevronUp } from "lucide-react";
 
 interface Appointment {
@@ -6,21 +7,34 @@ interface Appointment {
   subject: string;
   message: string;
   time: string;
-  date: string;
+  datetime: string;
   department: string;
-  status: "scheduled" | "in_progress" | "cancelled" | "completed";
+  video_service_state: "scheduled" | "in_progress" | "cancelled" | "completed";
 }
 
 const statusConfig = {
-  scheduled: { label: "ACEITE", color: "bg-blue-50 text-blue-700 border-blue-200" },
-  in_progress: { label: "EM PROGRESSO", color: "bg-green-50 text-green-700 border-green-200" },
-  cancelled: { label: "CANCELADO", color: "bg-red-50 text-red-700 border-red-200" },
-  completed: { label: "CONCLUÍDO", color: "bg-gray-50 text-gray-700 border-gray-200" },
+  scheduled: {
+    label: "ACEITE",
+    color: "bg-blue-50 text-blue-700 border-blue-200",
+  },
+  in_progress: {
+    label: "EM PROGRESSO",
+    color: "bg-green-50 text-green-700 border-green-200",
+  },
+  cancelled: {
+    label: "CANCELADO",
+    color: "bg-red-50 text-red-700 border-red-200",
+  },
+  completed: {
+    label: "CONCLUÍDO",
+    color: "bg-gray-50 text-gray-700 border-gray-200",
+  },
 };
 
 interface AppointmentCardProps {
   appointment: Appointment;
   isExpanded: boolean;
+  isLoading: boolean;
   onToggle: () => void;
   onCancel: () => void;
   formatDate: (date: string) => string;
@@ -29,26 +43,31 @@ interface AppointmentCardProps {
 export default function AppointmentCard({
   appointment,
   isExpanded,
+  isLoading,
   onToggle,
   onCancel,
   formatDate,
 }: AppointmentCardProps) {
-  const statusInfo = statusConfig[appointment.status] || statusConfig.scheduled;
+  const statusInfo =
+    statusConfig[appointment.video_service_state] || statusConfig.scheduled;
+  console.log("appCard", appointment);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden transition-all duration-300 hover:shadow-md hover:border-gray-200">
-      {/* Card Header */}
       <div className="flex items-center justify-between ">
         <div className="flex flex-col space-y-1 text-xs font-bold uppercase tracking-wider">
           <span className="text-gray-500">DEPARTAMENTO</span>
-          <span className="text-gray-600 leading-tight">{appointment.department}</span>
+          <span className="text-gray-600 leading-tight">
+            {appointment.department}
+          </span>
         </div>
-        <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg border ${statusInfo.color}`}>
+        <span
+          className={`px-3 py-1.5 text-xs font-semibold rounded-lg border ${statusInfo.color}`}
+        >
           {statusInfo.label}
         </span>
       </div>
 
-      {/* Card Content */}
       <div>
         <h3 className="text-xl font-semibold text-blue-500 leading-tight py-3">
           {appointment.subject}
@@ -74,12 +93,15 @@ export default function AppointmentCard({
               </p>
             </div>
 
-            {appointment.status === "scheduled" && (
+            {appointment.video_service_state === "scheduled" && (
               <button
                 onClick={onCancel}
-                className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all duration-200 hover:shadow-sm"
+                className={`w-full px-4 py-3 bg-gray-200 hover:bg-red-500 text-gray-700 hover:text-white font-medium rounded-lg transition-all duration-200 hover:shadow-sm ${
+                  isLoading ? "cursor-wait opacity-70" : ""
+                }`}
+                disabled={isLoading}
               >
-                Cancelar
+                {isLoading ? "Cancelando..." : "Cancelar"}
               </button>
             )}
           </div>
@@ -90,7 +112,8 @@ export default function AppointmentCard({
           <div className="flex items-center text-sm text-gray-600">
             <Calendar className="w-4 h-4 mr-2 text-gray-400" />
             <span className="font-medium">
-              {formatDate(appointment.date)} | {appointment.time}
+              {formatDate(appointment.datetime)} |{" "}
+              {formatTime(appointment.datetime)}
             </span>
           </div>
           <button

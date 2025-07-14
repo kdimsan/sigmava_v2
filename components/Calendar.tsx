@@ -7,14 +7,15 @@ import { useState, useEffect } from "react";
 interface CalendarProps {
   selectedDate?: Date;
   onDateSelect?: (date: Date) => void;
+  daysWithEvents: string[];
 }
 
 export default function Calendar({
   selectedDate,
   onDateSelect,
+  daysWithEvents,
 }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [daysWithEvents, setDaysWithEvents] = useState<string[]>([]);
 
   const monthNames = [
     "Janeiro",
@@ -32,29 +33,6 @@ export default function Calendar({
   ];
 
   const dayNames = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-
-  // Buscar agendamentos para o mês/ano corrente
-  useEffect(() => {
-    async function fetchAppointments() {
-      const allAppointments = await getAppointments("scheduled");
-      console.log("all", allAppointments);
-
-      // Filtrar só agendamentos do mês e ano atuais
-      const filtered = allAppointments.filter((app) => {
-        const appDate = new Date(app.date); // app.date é 'yyyy-mm-dd'
-        return (
-          appDate.getFullYear() === currentDate.getFullYear() &&
-          appDate.getMonth() === currentDate.getMonth()
-        );
-      });
-
-      // Pegar só as datas (string 'yyyy-mm-dd') sem duplicar
-      const uniqueDates = Array.from(new Set(filtered.map((app) => app.date)));
-      setDaysWithEvents(uniqueDates);
-    }
-
-    fetchAppointments();
-  }, [currentDate]);
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -122,10 +100,10 @@ export default function Calendar({
   };
 
   function toLocalISODate(date: Date) {
-    const year = date.getFullYear()
-    const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const day = date.getDate().toString().padStart(2, '0')
-    return `${year}-${month}-${day}`
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
   }
   return (
     <div className="bg-white rounded-lg p-4">
@@ -166,7 +144,6 @@ export default function Calendar({
           const dayISO = toLocalISODate(dayObj.date);
           const hasEvent =
             dayObj.isCurrentMonth && daysWithEvents.includes(dayISO);
-
           return (
             <button
               key={index}

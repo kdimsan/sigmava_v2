@@ -1,7 +1,7 @@
 "use server";
+import { Appointment } from "@/components/AppointmentList";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { getDepartments } from "./departments";
 
 export async function getAppointments(status?: string) {
   const supabase = await createClient();
@@ -36,7 +36,7 @@ export async function getAppointments(status?: string) {
     console.error("Erro ao buscar departamentos:", deptError);
     return [];
   }
-  
+
   const departmentMap = new Map(
     departments.map((dept) => [dept.id, dept.name])
   );
@@ -95,7 +95,10 @@ export async function rescheduleAppointment(
 
   const { error } = await supabase
     .from("video_services")
-    .update({ datetime: localDateTimeString, video_service_state: "in_progress" })
+    .update({
+      datetime: localDateTimeString,
+      video_service_state: "in_progress",
+    })
     .eq("id", appointmentId);
   if (error) {
     console.error("Erro ao reagendar chamada:", error);
@@ -112,4 +115,47 @@ export async function completeAppointment(id: string) {
     .from("video_services")
     .update({ video_service_state: "completed" })
     .eq("id", id);
+}
+
+export async function getAppointmentsByOwnerId() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    console.error("Erro ao obter usuário autenticado:", userError);
+    return [];
+  }
+
+  const userId = user.id;
+
+  const { data: profileData ,error: profileError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", userId)
+    .single();
+
+  if (profileError) {
+    console.error("Erro ao buscar perfil:", profileError);
+    return [];
+  }
+
+  const { data: appointments, error: appointmentsError } = await supabase
+    .from("video_services")
+    .select("*")
+    .eq("owner_id", profileData.id)
+    .order("datetime", { ascending: true });
+
+  if (appointmentsError || !appointments) {
+    console.error(
+      "Erro ao buscar agendamentos por owner_id:",
+      appointmentsError
+    );
+    return [];
+  }
+  
+  return appointments as Appointment[];
 }

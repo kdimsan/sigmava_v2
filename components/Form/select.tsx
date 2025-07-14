@@ -37,7 +37,7 @@ export default function SelectField({
     
     <div className={`space-y-1 ${className}`}>
       {label && (
-        <label className="text-xs mb-2 font-semibold tracking-wide text-gray-700 uppercase">
+        <label className="text-[10px] mb-2 font-semibold tracking-wide text-gray-700 uppercase md:text-xs">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -47,11 +47,11 @@ export default function SelectField({
       <Select.Root value={value} onValueChange={onChange} disabled={disabled}>
         <Select.Trigger
           className={`
-            w-full border rounded-md px-4 py-3 text-sm flex justify-between items-center transition-colors
+            w-full rounded-md px-4 py-3 text-sm flex justify-between items-center transition-colors
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
             ${disabled ? "bg-gray-100 cursor-not-allowed text-gray-400" : ""}
             ${!value && !disabled ? "text-gray-400 bg-gray-50" : ""}
-            ${value && !disabled ? "text-gray-900 bg-white" : ""}
+            ${value && !disabled ? "text-gray-900 bg-gray-100" : ""}
           `}
         >
           <Select.Value placeholder={placeholder} />

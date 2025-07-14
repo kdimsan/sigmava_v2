@@ -41,9 +41,8 @@ export default function AvailabilityForm({ onCancel }: FormWithCancelProps) {
 
     const formData = new FormData(e.currentTarget);
 
-    // Adiciona os dias selecionados no formData
     selectedDays.forEach((date) => {
-      formData.append("calendarDates[]", date.toISOString().split("T")[0]);
+      formData.append("calendarDates[]", date.toLocaleDateString("sv-SE"));
     });
 
     try {
@@ -75,23 +74,6 @@ export default function AvailabilityForm({ onCancel }: FormWithCancelProps) {
             onSelect={setSelectedDays}
             className="border rounded-md p-2 mt-1 bg-white"
           />
-          {/* Hidden inputs removidos, pois adicionamos manualmente no formData */}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Duração da chamada</label>
-          <select
-            name="meetingDuration"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            className="w-full border rounded-md p-2"
-          >
-            {availabilityOptions.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div>
@@ -121,6 +103,22 @@ export default function AvailabilityForm({ onCancel }: FormWithCancelProps) {
           >
             + Adicionar horário
           </button>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Duração da chamada</label>
+          <select
+            name="duration"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            className="w-full border rounded-md p-2"
+          >
+            {availabilityOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="w-full flex gap-5 text-white">

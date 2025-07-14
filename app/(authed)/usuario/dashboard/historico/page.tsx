@@ -32,7 +32,7 @@ export default async function CallsHistory() {
     }
 
   return (
-    <main>
+    <main className="max-w-5xl mx-auto px-6">
       <PageHeader
         title="Histórico"
         subtitle="Video Atendimentos"

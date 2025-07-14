@@ -43,30 +43,21 @@ export async function createDepartment(formData: FormData) {
   console.log("Departamento criado com sucesso!");
 }
 
-export async function getDepartments(id?: number) {
+export async function getDepartments(licenseId?: number) {
   const supabase = await createClient();
 
-  if (id) {
-    const { data, error } = await supabase
-      .from("departments")
-      .select("id, name")
-      .eq("id", id)
-      .single();
+  const query = supabase.from("departments").select("id, name");
 
-    if (error) {
-      console.error("Erro ao buscar departamentos:", error);
-      return [];
-    }
-
-    return data ? [data] : [];
+  if (licenseId) {
+    query.eq("license_id", licenseId);
   }
 
-  const { data, error } = await supabase.from("departments").select("id, name");
+  const { data, error } = await query;
 
   if (error) {
     console.error("Erro ao buscar departamentos:", error);
     return [];
   }
 
-  return data;
+  return data || [];
 }

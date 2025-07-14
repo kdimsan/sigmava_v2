@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
 import Header from "@/components/Header/Header";
 import { createClient } from "@/utils/supabase/server";
-import { getClientProfile } from "@/lib/auth";
+import { getClientProfile, getUserProfile } from "@/lib/auth";
 
 import { getDepartments } from "../../admin/dashboard/actions/departments";
 import { getLogoUrlByLicense } from "../../actions/getLicenseLogo";
 import MobileHeader from "@/components/MobileHeader";
 import { Toaster } from "react-hot-toast";
+import { getUser } from "./actions/user";
 
 export default async function UserLayout({
   children,
@@ -19,8 +20,9 @@ export default async function UserLayout({
     redirect("/login");
   }
 
-  const userProfile = await getClientProfile(data.user.email!);
-  const departments = await getDepartments();
+  const userProfile = await getUser();
+
+  const departments = await getDepartments(userProfile?.license_id);
 
   const headerUser = {
     name: userProfile?.name!,
@@ -32,17 +34,15 @@ export default async function UserLayout({
     name: headerUser.name,
     avatar: headerUser.avatar,
     logo: "",
-    role: headerUser.role
+    role: headerUser.role,
   };
 
-  // if (userProfile?.role !== "superuser") {
-  //   const logoUrl = await getLogoUrlByLicense(userProfile!.license_id);
-  //   userData.logo = logoUrl;
-  // }
+  const logoUrl = await getLogoUrlByLicense(userProfile!.license_id);
+  userData.logo = logoUrl;
 
   return (
     <div className="min-h-screen bg-gray-50 p-2">
-      <div className="hidden md:block">
+      <div className="">
         <Header user={userData} departments={departments} />
       </div>
       <Toaster position="top-center" />

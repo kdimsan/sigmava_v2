@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   }
 
   const userProfile = await getUserProfile(data.user.id);
-  const departments = await getDepartments();
+  const departments = await getDepartments(userProfile!.license_id);
 
   const headerUser = {
     name: userProfile?.full_name || data.user.email?.split("@")[0] || "Usuário",

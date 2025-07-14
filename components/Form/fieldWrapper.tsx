@@ -11,7 +11,7 @@ export default function FieldWrapper({ label, error, required, children }: Field
   return (
     <div className="space-y-1">
       {label && (
-        <label className="block text-xs font-medium text-gray-700">
+        <label className="block text-xs font-semibold tracking-wide uppercase text-gray-700">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}

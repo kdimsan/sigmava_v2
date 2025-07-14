@@ -8,6 +8,7 @@ import { updateUser } from "@/app/(authed)/usuario/dashboard/actions/updateUser"
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
+import { logout } from "@/app/logout/actions";
 
 interface UserProps {
   user_id: string;
@@ -118,6 +119,14 @@ export default function ProfileSettings({ user, licenses }: ProfileProps) {
             className="flex-1 px-6 py-3 bg-blue-600 shadow-md shadow-blue-700 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
           >
             Guardar
+          </button>
+        </div>
+        <div className="w-full flex">
+          <button
+            className="flex-1 px-6 py-3 bg-blue-600 shadow-md shadow-blue-700 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
+            onClick={logout}
+          >
+            Sair
           </button>
         </div>
       </div>

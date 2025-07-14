@@ -37,7 +37,7 @@ export async function login(formData: FormData) {
       case "admin":
         destination = "/admin/dashboard";
         break;
-        case "employee":
+      case "employee":
         destination = "/admin/dashboard";
         break;
       default:

@@ -14,8 +14,7 @@ export async function getAppointmentsByUserId() {
     if (!user) {
       return [];
     }
-  
-    // Busca agendamentos
+
     const { data: appointments, error } = await supabase
       .from("video_services")
       .select("*")
@@ -24,8 +23,7 @@ export async function getAppointmentsByUserId() {
     if (error || !appointments) {
       return [];
     }
-  
-    // Pega IDs únicos dos departamentos
+
     const departmentIds = Array.from(
       new Set(appointments.map((a) => a.department_id).filter(Boolean))
     );
@@ -36,25 +34,16 @@ export async function getAppointmentsByUserId() {
     if (departmentIds.length === 0) {
       return appointments.map((a) => ({ ...a, department_name: null }));
     }
-  
-    // Busca nomes dos departamentos
+
     const { data: departments } = await supabase
       .from("departments")
       .select("id, name")
       .in("id", departmentIds);
-
-      console.log("dep", departments);
-      
-  
-    // Cria mapa para lookup rápido
+   
     const departmentMap = new Map(
       departments?.map((d) => [d.id, d.name]) ?? []
     );
-
-    console.log("DEART", departmentMap);
     
-  
-    // Junta os nomes no retorno
     const enrichedAppointments = appointments.map((a) => ({
       ...a,
       department_name: departmentMap.get(a.department_id) || null,
@@ -67,7 +56,7 @@ export async function getAppointmentsByUserId() {
   }
   
 
-export async function createAppointment(formData: FormData) {
+  export async function createAppointment(formData: FormData) {
     const department = formData.get("department");
     const subject = formData.get("subject");
     const message = formData.get("message");
@@ -82,8 +71,21 @@ export async function createAppointment(formData: FormData) {
     const datetime = `${date}T${start_time}`;
   
     const supabase = await createClient();
-
+  
     const clientData = await getUser();
+  
+    const { data: slotData, error: slotError } = await supabase
+      .from("available_slots")
+      .select("user_id")
+      .eq("id", slot_id)
+      .single();
+  
+    if (slotError || !slotData?.user_id) {
+      console.error("Erro ao buscar slot ou owner_id:", slotError);
+      throw new Error("Não foi possível identificar o responsável pelo horário.");
+    }
+  
+    const owner_id = slotData.user_id;
   
     const { error } = await supabase.from("video_services").insert([
       {
@@ -94,9 +96,9 @@ export async function createAppointment(formData: FormData) {
         slot_id: Number(slot_id),
         client_id: clientData!.client_id,
         user_id: clientData!.user_id,
-        // Exemplo: você pode definir o ID do cliente aqui, se necessário:
-        // client_id: someClientId,
-        // slot_id: opcional, se quiser associar ao slot:
+        client_name: clientData!.name,
+        owner_id, 
+        video_service_state: "in_progress"
       },
     ]);
   
@@ -106,4 +108,5 @@ export async function createAppointment(formData: FormData) {
     }
   
     redirect("/usuario/dashboard/agendar-chamada/sucesso");
-}
+  }
+  
