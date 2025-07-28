@@ -8,6 +8,8 @@ import Calendar from "@/assets/svgs/calendar";
 import Link from "next/link";
 import Check from "@/assets/svgs/check";
 import { formatDate, formatTime } from "@/utils/formats";
+import { useRouter } from "next/navigation";
+
 
 export interface Appointment {
   id: string;
@@ -36,6 +38,8 @@ export default function AppointmentList({
   onReschedule,
   onComplete,
 }: AppointmentListProps) {
+  const router = useRouter();
+
   return (
     <div className="rounded-lg">
       <div className="flex gap-1 items-center my-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
@@ -105,10 +109,10 @@ export default function AppointmentList({
                   <td className="py-3">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={
+                        onClick={() =>
                           appointment.video_service_state === "in_progress"
-                            ? () => onApprove?.(appointment.id)
-                            : () => onComplete?.(appointment.id)
+                            ? onApprove?.(appointment.id)
+                            : router.push(`/admin/dashboard/chamada/${appointment.id}`)
                         }
                         className={`w-9 h-9 bg-green-400 rounded-full flex items-center justify-center transition-colors ${
                           !onApprove || !onComplete

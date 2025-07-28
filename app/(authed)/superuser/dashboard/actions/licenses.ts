@@ -1,6 +1,7 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
 import { supabaseAdmin } from "@/utils/supabase/admin";
+import { randomUUID } from "crypto";
 
 export async function createLicense(formData: FormData) {
   const supabase = await createClient();
@@ -13,7 +14,7 @@ export async function createLicense(formData: FormData) {
     postal_code: formData.get("zip"),
     contributing_number: formData.get("contributing_number"),
     abey: formData.get("abey"),
-    license_key: "LIC-MC7QR09F-5OOSXMSSSS",
+    license_key: randomUUID(),
     available_users: formData.get("available_users"),
     disabled: false,
     created_at: new Date(),

@@ -7,13 +7,15 @@ import UserAdd from "@/assets/svgs/userAdd";
 import UsersAdd from "@/assets/svgs/usersAdd";
 import Clock from "@/assets/svgs/clock";
 import User from "@/assets/svgs/user";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CreateUserForm from "./forms/createUserForm";
 import PopoverItem from "./PopoverItem";
 import Department from "./forms/department";
 import Availability from "./forms/avaiability";
 import Link from "next/link";
 import Profile from "../Profile";
+import { registerQuickBloxUser } from "@/services/qb-user";
+import toast from "react-hot-toast";
 
 interface DepartmentProps {
   id: number;
@@ -26,6 +28,7 @@ interface HeaderProps {
     role?: string;
     avatar?: string;
     logo: string;
+    email: string;
   };
   departments: DepartmentProps[];
 }
@@ -35,6 +38,11 @@ export default function Header({ user, departments }: HeaderProps) {
   const [activeForm, setActiveForm] = useState<
     null | "user" | "department" | "availability" | "notifications" | "profile"
   >(null);
+
+  const DEFAULT_PASSWORD = "12345678QWERTY";
+
+  console.log("name", user.name);
+  
 
   const navigationItems = [
     {
@@ -123,6 +131,34 @@ export default function Header({ user, departments }: HeaderProps) {
             item.label === "DISPONIBILIDADE"
         )
       : navigationItems.filter((item) => !item.isLucide);
+
+  useEffect(() => {
+    const createQBUser = async () => {
+      if (!user || !user.name) return;
+      console.log("ENTROU");
+      
+
+      try {
+        await registerQuickBloxUser({
+          email: user.email,
+          password: DEFAULT_PASSWORD,
+          fullName: user.name,
+        });
+
+        console.log("✅ Usuário QuickBlox criado com sucesso!");
+        toast.success("Usuário QuickBlox criado!");
+      } catch (err: any) {
+        if (err.message) {
+          console.log("Usuário já existe no QuickBlox.");
+        } else {
+          console.error("Erro ao criar usuário QuickBlox:", err);
+          toast.error("Erro ao criar usuário no QuickBlox.");
+        }
+      }
+    };
+
+    createQBUser();
+  }, [user.name]);
 
   return (
     <header className="bg-white border-b border-gray-200 w-11/12 my-2.5 mx-auto rounded-md px-6 py-4">
@@ -241,7 +277,6 @@ export default function Header({ user, departments }: HeaderProps) {
       <div className="flex flex-col md:hidden">
         <span>Bem vindo {user.name} </span>
         <span>ao SIGMAVA</span>
-
       </div>
     </header>
   );

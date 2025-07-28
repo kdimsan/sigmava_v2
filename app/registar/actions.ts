@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/utils/supabase/admin";
+import { registerQuickBloxUser } from "@/services/qb-user";
 
 export async function registerUser(formData: FormData) {
   const supabase = createClient();
@@ -35,4 +36,7 @@ export async function registerUser(formData: FormData) {
     console.error("Erro ao criar cliente:", dbError);
     throw new Error("Erro ao salvar dados no banco.");
   }
+  /* 
+    criar uma room, ver video conference ou video calling (melhor)
+  */
 }

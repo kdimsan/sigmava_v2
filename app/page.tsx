@@ -25,7 +25,7 @@ export default function Home() {
         </div>
       </div>
       <div className="w-full md:w-1/2 h-full flex flex-col justify-center items-center md:-mt-10 md:px-10">
-        <h1 className="text-[32px] w-full text-start font-medium mb-8">
+        <h1 className="text-[32px] w-fit text-start font-medium mb-8 mx-auto">
           <span className="text-blue-600 font-bold">
             A sua Câmara
             <br /> Municipal,

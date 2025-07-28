@@ -1,5 +1,6 @@
 import { formatTime } from "@/utils/formats";
 import { Calendar, ChevronDown, ChevronUp } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Appointment {
   id: string;
@@ -48,13 +49,19 @@ export default function AppointmentCard({
   onCancel,
   formatDate,
 }: AppointmentCardProps) {
+  const router = useRouter();
   const statusInfo =
     statusConfig[appointment.video_service_state] || statusConfig.scheduled;
   console.log("appCard", appointment);
 
+  const handleNav = () => {
+    router.push(`/usuario/dashboard/chamada/${appointment.id}`)
+  }
+  
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden transition-all duration-300 hover:shadow-md hover:border-gray-200">
-      <div className="flex items-center justify-between ">
+      <div onClick={handleNav} className="flex items-center justify-between ">
         <div className="flex flex-col space-y-1 text-xs font-bold uppercase tracking-wider">
           <span className="text-gray-500">DEPARTAMENTO</span>
           <span className="text-gray-600 leading-tight">

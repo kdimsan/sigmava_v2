@@ -1,6 +1,7 @@
 // app/(authed)/home/actions/users.ts
 "use server";
 
+import { registerQuickBloxUser } from "@/services/qb-user";
 import { supabaseAdmin } from "@/utils/supabase/admin";
 import { createClient } from "@/utils/supabase/server";
 
@@ -32,6 +33,8 @@ export async function createUsers(formData: FormData) {
   const role = formData.get("user_type") as string;
   const departmentId = parseInt(formData.get("department") as string);
 
+  //criando um email fake, devo pegar esse email no form também?
+  //Dados faltam algum?
   const email = `${name.toLowerCase().replace(/\s+/g, "")}@sigmava.pt`;
 
   const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -60,11 +63,21 @@ export async function createUsers(formData: FormData) {
     created_at: new Date(),
     updated_at: new Date(),
   });
-
+  
   if (profileInsertError) {
     console.error("Erro ao criar perfil:", profileInsertError);
     return;
   }
+  try {
+    await registerQuickBloxUser({
+      email: newUser.user.id,
+      password,
+      fullName: name,
+    });
+    console.log("Usuário QuickBlox criado com sucesso!");
+  } catch (err) {
+    console.error("Erro ao criar no QuickBlox:", err);
 
+  }
   console.log("Usuário criado com sucesso!");
 }

@@ -19,17 +19,15 @@ export default async function DashboardLayout({
   const userProfile = await getUserProfile(data.user.id);
   const departments = await getDepartments(userProfile!.license_id);
 
-  const headerUser = {
-    name: userProfile?.full_name || data.user.email?.split("@")[0] || "Usuário",
-    role: userProfile?.role!,
-    avatar: data.user.user_metadata?.avatar_url,
-  };
+  console.log("userpf", userProfile);
+  
 
   let userData = {
-    name: headerUser.name,
-    role: headerUser.role,
-    avatar: headerUser.avatar,
+    name: userProfile?.name!,
+    role: userProfile?.role,
+    avatar: data.user.user_metadata?.avatar_url,
     logo: "",
+    email: userProfile?.email!,
   };
 
   if (userProfile?.role !== "superuser") {

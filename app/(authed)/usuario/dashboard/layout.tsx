@@ -24,17 +24,12 @@ export default async function UserLayout({
 
   const departments = await getDepartments(userProfile?.license_id);
 
-  const headerUser = {
-    name: userProfile?.name!,
-    role: "user",
-    avatar: data.user.user_metadata?.avatar_url,
-  };
-
   let userData = {
-    name: headerUser.name,
-    avatar: headerUser.avatar,
+    name: userProfile?.name!,
+    avatar: data.user.user_metadata?.avatar_url,
     logo: "",
-    role: headerUser.role,
+    role: "user",
+    email: userProfile?.email!,
   };
 
   const logoUrl = await getLogoUrlByLicense(userProfile!.license_id);

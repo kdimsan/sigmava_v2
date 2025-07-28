@@ -75,7 +75,7 @@ export async function getAppointmentsByUserId() {
     const clientData = await getUser();
   
     const { data: slotData, error: slotError } = await supabase
-      .from("available_slots")
+      .from("slots")
       .select("user_id")
       .eq("id", slot_id)
       .single();
